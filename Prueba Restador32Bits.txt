@@ -1,0 +1,34 @@
+module test;
+  reg [31:0] A,B;
+  reg Ci;
+  wire [31:0] S;
+  wire Co;
+  Restador r1 (x,y,z,R,C);
+  
+  initial begin 
+    x = 1'b1;
+    #35 x = 1'b1;
+    #25 x = 1'b0;
+    #35 x = 1'b0;
+    #10 $stop; 
+  end 
+  
+  initial begin 
+    y = 1'b1;
+    #35 y = 1'b0;
+    #25 y = 1'b1;
+    #35 y = 1'b0;
+    #10 $stop; 
+  end 
+  
+  initial begin 
+    z = 1'b0;
+    #35 z = 1'b0;
+    #25 z = 1'b0;
+    #35 z = 1'b0;
+    #10 $stop; 
+  end 
+  initial
+    $monitor("At time %t, C = %h, R = %h",
+              $time, C, R);
+endmodule
