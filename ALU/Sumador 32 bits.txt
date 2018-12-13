@@ -1,0 +1,55 @@
+module medioSumador(x,y,S,C);
+  input x,y;
+  output S,C;
+  xor(S,x,y);
+  and(C,x,y);
+endmodule
+
+module sumadorCompleto(A,B,Ci,S,Co);
+  input A,B, Ci;
+  output S,Co;
+  wire P,G,H;
+  medioSumador ms1(A,B,P,G);
+  medioSumador ms2(P,Ci,S,H);
+  or(Co,G,H);
+endmodule
+
+module sumador32bits(A,B,Ci,S,Co);
+  input [31:0] A,B;
+  input Ci;
+  output [31:0] S;
+  output Co;
+  wire C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31;
+ 	sumador_completo sc0(A[0],B[0],Ci,S[0],C1);
+	sumador_completo sc1(A[1],B[1],C1,S[1],C2);
+	sumador_completo sc2(A[2],B[2],C2,S[2],C3);
+	sumador_completo sc3(A[3],B[3],C3,S[3],C4);
+	sumador_completo sc4(A[4],B[4],C4,S[4],C5);
+	sumador_completo sc5(A[5],B[5],C5,S[5],C6);
+	sumador_completo sc6(A[6],B[6],C6,S[6],C7);
+	sumador_completo sc7(A[7],B[7],C7,S[7],C8);
+	sumador_completo sc8(A[8],B[8],C8,S[8],C9);
+	sumador_completo sc9(A[9],B[9],C9,S[9],C10);
+	sumador_completo sc10(A[10],B[10],C10,S[10],C11);
+	sumador_completo sc11(A[11],B[11],C11,S[11],C12);
+	sumador_completo sc12(A[12],B[12],C12,S[12],C13);
+	sumador_completo sc13(A[13],B[13],C13,S[13],C14);
+	sumador_completo sc14(A[14],B[14],C14,S[14],C15);
+	sumador_completo sc15(A[15],B[15],C15,S[15],C16);
+	sumador_completo sc16(A[16],B[16],C16,S[16],C17);
+	sumador_completo sc17(A[17],B[17],C17,S[17],C18);
+	sumador_completo sc18(A[18],B[18],C18,S[18],C19);
+	sumador_completo sc19(A[19],B[19],C19,S[19],C20);
+	sumador_completo sc20(A[20],B[20],C20,S[20],C21);
+	sumador_completo sc21(A[21],B[21],C21,S[21],C22);
+	sumador_completo sc22(A[22],B[22],C22,S[22],C23);
+	sumador_completo sc23(A[23],B[23],C23,S[23],C24);
+	sumador_completo sc24(A[24],B[24],C24,S[24],C25);
+	sumador_completo sc25(A[25],B[25],C25,S[25],C26);
+	sumador_completo sc26(A[26],B[26],C26,S[26],C27);
+	sumador_completo sc27(A[27],B[27],C27,S[27],C28);
+	sumador_completo sc28(A[28],B[28],C28,S[28],C29);
+	sumador_completo sc29(A[29],B[29],C29,S[29],C30);
+	sumador_completo sc30(A[30],B[30],C30,S[30],C31);
+  	sumador_completo sc31(A[31],B[31],C31,S[31],Co);
+endmodule
