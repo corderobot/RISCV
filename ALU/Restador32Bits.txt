@@ -1,0 +1,14 @@
+module RestadorCompleto(x,y,z,R,C);
+  input x,y,z;
+  output R,C;
+  wire e,f,g,h,i,j;
+  xor(e, x, y);
+  xor(R, e, z);
+  not(j, x);
+  and(f, j, y);
+  and(g,j,z);
+  and(h,y,z);
+  or(i,g,h);
+  or(C,f,i);
+endmodule
+  
