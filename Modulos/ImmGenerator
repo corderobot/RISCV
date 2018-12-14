@@ -1,0 +1,37 @@
+module ImmGenerator(Inst, MI, MS, MSB, MU, MUJ, SOR);
+  input [31:0] Inst;
+  input MI, MS, MSB, MU, MUJ;
+  wire [2:0] WMI, WMS, WMSB, WMU, WMUJ;
+  wire S01, S02, S03, S04, S05, S11, S12, S13, S14, S15, S21, S22, S23, S24, S25;
+  output [2:0] SOR;
+  
+  and (WMS[0], 1'b0 , 1'b0);
+  and (WMU[0], 1'b0 , 1'b0);
+  and (WMI[1], 1'b0 , 1'b0);
+  and (WMU[1], 1'b0 , 1'b0);
+  and (WMUJ[1], 1'b0 , 1'b0);
+  and (WMI[2], 1'b0 , 1'b0);
+  and (WMS[2], 1'b0 , 1'b0);
+  and (WMSB[2], 1'b0 , 1'b0);
+  
+  and (WMI[0], MI, 1'b1);
+  and (WMS[1], MS, 1'b1);
+  and (WMSB[0], MSB, 1'b1);
+  and (WMSB[1], MSB, 1'b1);
+  and (WMU[2], MU, 1'b1);
+  and (WMUJ[2], MUJ, 1'b1);
+  and (WMUJ[0], MUJ, 1'b1);
+  
+  or (S01, WMI[0], WMS[0]);
+  or (S02, WMSB[0], WMU[0]);
+  or (S03, WMUJ[0], S01);
+  or (SOR[0], S02, S03);
+  or (S11, WMI[1], WMS[1]);
+  or (S12, WMSB[1], WMU[1]);
+  or (S13, WMUJ[1], S11);
+  or (SOR[1], S12, S13);
+  or (S21, WMI[2], WMS[2]);
+  or (S22, WMSB[2], WMU[2]);
+  or (S23, WMUJ[2], S21);
+  or (SOR[2], S22, S23);
+endmodule 
