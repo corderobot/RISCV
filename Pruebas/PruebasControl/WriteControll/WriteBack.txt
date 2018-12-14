@@ -1,0 +1,16 @@
+module test;
+  reg [6:0] A;
+  wire pc, alu, mem, imm;
+  wire [1:0] wbe;
+  writeBackMultipleEnable a1(A, pc, alu, mem, imm);
+  writeBackControll asdf(pc, alu, mem, imm, wbe);
+  
+  initial begin 
+    A = 7'b0010111; 
+    
+    #10 $stop; 
+  end 
+  initial
+    $monitor("At time %t, wbe = %h",
+             $time, wbe);
+endmodule

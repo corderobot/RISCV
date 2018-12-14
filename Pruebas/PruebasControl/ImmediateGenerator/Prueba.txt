@@ -1,0 +1,14 @@
+module test;
+  reg [6:0] A;
+  wire i, s, sb, u, uj;
+  
+  immGeneratorControll asdf(A,i,s,sb,u,uj);
+  
+  initial begin 
+    A = 7'b1101111; 
+    #10 $stop; 
+  end 
+  initial
+    $monitor("At time %t, I = %h, S = %h, SB = %h, U = %h, UJ = %h",
+             $time, i, s, sb, u, uj);
+endmodule
