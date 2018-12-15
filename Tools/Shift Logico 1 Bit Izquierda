@@ -1,4 +1,4 @@
-module ShiftLogico1Bit(Original, Nuevo);
+module ShiftLogico1BitIzquierda(Original, Nuevo);
   input [31:0] Original;
   output [31:0] Nuevo;
   and (Nuevo[0], 1'b0, 1'b1);
