@@ -1,3 +1,7 @@
+//Universidad Galileo
+//Rodrigo Cordero
+//Kevin Hernandez
+
 //Terminado
 module multiplexorAEnable(opcode, enabledA);
   wire n2, n3, n4, n6, aux1, aux2;

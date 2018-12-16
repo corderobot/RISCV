@@ -1,3 +1,7 @@
+//Universidad Galileo
+//Rodrigo Cordero
+//Kevin Hernandez
+
 module loadEnable(opcode, lEn);
   input [6:0] opcode;
   output lEn;

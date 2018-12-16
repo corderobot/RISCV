@@ -1,3 +1,7 @@
+//Universidad Galileo
+//Rodrigo Cordero
+//Kevin Hernandez
+
 //Terminado
 module immGeneratorControll(opcode, immI, immS, immSB, immU, immUJ);
   input [6:0] opcode;

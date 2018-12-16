@@ -1,3 +1,8 @@
+//Universidad Galileo
+//Rodrigo Cordero
+//Kevin Hernandez
+
+
 module defaultSelector(instruction, defSelector);
   input [31:0] instruction;
   output [3:0] defEnable;

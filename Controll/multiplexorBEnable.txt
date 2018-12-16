@@ -1,3 +1,7 @@
+//Universidad Galileo
+//Rodrigo Cordero
+//Kevin Hernandez
+
 //Terminado
 module multiplexorBEnable(opcode, enabledB);
   wire n2;

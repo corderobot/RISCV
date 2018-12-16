@@ -1,3 +1,7 @@
+//Universidad Galileo
+//Rodrigo Cordero
+//Kevin Hernandez
+
 //Terminado
 module writeRegisterEnable(opcode, wre);
   input [6:0] opcode;
