@@ -432,7 +432,7 @@ module PrepararTipoUJ(Inst, TipoUJC);
   and (TipoUJ[16], Inst[10], 1'b1);
   and (TipoUJ[17], Inst[11], 1'b1);
   and (TipoUJ[18], Inst[12], 1'b1);
-  and (TipoUJ[18], Inst[24], 1'b1);
+  and (TipoUJ[19], Inst[24], 1'b1);
   and (TipoUJ[20], 1'b0, 1'b1);
   and (TipoUJ[21], 1'b0, 1'b1);
   and (TipoUJ[22], 1'b0, 1'b1);
