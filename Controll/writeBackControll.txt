@@ -1,6 +1,7 @@
 //Universidad Galileo
 //Rodrigo Cordero
 //Kevin Hernandez
+//Terminado
 
 module writeBackMultipleEnable(opcode, pc, alu, mem, imm);
   input [6:0] opcode;

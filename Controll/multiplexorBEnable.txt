@@ -1,8 +1,8 @@
 //Universidad Galileo
 //Rodrigo Cordero
 //Kevin Hernandez
-
 //Terminado
+
 module multiplexorBEnable(opcode, enabledB);
   wire n2;
   //n2 = bit 2 negado y asi sucesivamente

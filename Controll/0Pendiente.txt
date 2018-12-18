@@ -7,3 +7,4 @@
 - BranchControll: añadir pipeline
 - PCenable: añadir pipeline
 - NopControll: añadir pipeline
+- ImmediateGeneratorControll: modificar las señales para que se genere AUIPC

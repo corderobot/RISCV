@@ -1,6 +1,7 @@
 //Universidad Galileo
 //Rodrigo Cordero
 //Kevin Hernandez
+//Terminado
 
 module muliplexor1bit_2_1(inputA, inputB, sel, out);
   input inputA, inputB, sel;

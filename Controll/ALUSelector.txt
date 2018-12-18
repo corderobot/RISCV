@@ -1,11 +1,11 @@
 //Universidad Galileo
 //Rodrigo Cordero
 //Kevin Hernandez
-
+//Terminado
 
 module defaultSelector(instruction, defSelector);
   input [31:0] instruction;
-  output [3:0] defEnable;
+  output defSelector;
   
   and(defSelector, instruction[0], instruction[1]);
 endmodule
@@ -63,7 +63,7 @@ module andSelector(instruction, andEnable);
   or(aux2, aux1, n5);
   and(aux3, aux2, instruction[4], instruction[12], instruction[13], instruction[14]);
   
-  aissgn andEnable = aux2*3;
+  assign andEnable = aux3*3;
 endmodule
 
 module orSelector(instruction, orEnable);
@@ -145,7 +145,7 @@ module mulhSelector(instruction, mulhEnable);
   
   //n2 = bit 2 negado
   not(n2, instruction[2]);
-  not(n13, instuction[13]);
+  not(n13, instruction[13]);
   not(n14, instruction[14]);
   
   and(aux, n2, instruction[5], instruction[25], instruction[4], instruction[12], n13, n14);
@@ -160,7 +160,7 @@ module divSelector(instruction, divEnable);
   
   //n2 = bit 2 negado
   not(n2, instruction[2]);
-  not(n12, instuction[12]);
+  not(n12, instruction[12]);
   not(n13, instruction[13]);
   
   and(aux, n2, instruction[5], instruction[25], instruction[4], n12, n13, instruction[14]);
@@ -175,7 +175,7 @@ module remSelector(instruction, remEnable);
   
   //n2 = bit 2 negado
   not(n2, instruction[2]);
-  not(n12, instuction[12]);
+  not(n12, instruction[12]);
   
   and(aux, n2, instruction[5], instruction[25], instruction[4], n12, instruction[13], instruction[14]);
   
@@ -189,10 +189,10 @@ module subSelector(instruction, subEnable);
   
   //n2 = bit 2 negado
   not(n2, instruction[2]);
-  not(n12, instuction[12]);
-  not(n13, instuction[13]);
-  not(n14, instuction[14]);
-  not(n25, instuction[25]);
+  not(n12, instruction[12]);
+  not(n13, instruction[13]);
+  not(n14, instruction[14]);
+  not(n25, instruction[25]);
   
   and(aux, n2, instruction[5], n25, instruction[30], instruction[4], n12, n13, n14);
   
@@ -212,7 +212,7 @@ endmodule
 
 module multiplexor4bits_2_1(input1M, input2M, signal, outputM);
   input [3:0] input1M, input2M;
-  input selector;
+  input signal;
   output [3:0] outputM;
   
   muliplexor1bit_2_1 m0(input1M[0], input2M[0], signal, outputM[0]);
@@ -231,7 +231,7 @@ module aluSelector(srlEn, addEn, andEn, orEn, xorEn, sltEn, mulEn, mulhEn, divEn
   assign defChoice = 4'b0010;
   assign orChoice = srlEn | addEn | andEn | orEn | xorEn | sltEn | mulEn | mulhEn |  divEn | remEn | subEn;
   
-  multiplexor4bits_2_1 m0(defChoice, orChoice, defaultSignal, aluChoice);
+  multiplexor4bits_2_1 m0(orChoice, defChoice, defaultSignal, aluChoice);
 endmodule
 
 module aluSelectorControll(instruction, aluChoice);
@@ -256,12 +256,6 @@ module aluSelectorControll(instruction, aluChoice);
 	remSelector remS(instruction, remEn);
 	subSelector subS(instruction, subEn);
   
-  aluSelector aS(sllEn, srlEn, addEn, andEn, orEn, xorEn, sltEn, mulEn, mulhEn, divEn, remEn, subEn, defaultSignal, aluChoice);
+  aluSelector aS(srlEn, addEn, andEn, orEn, xorEn, sltEn, mulEn, mulhEn, divEn, remEn, subEn, defaultSignal, aluChoice);
   
 endmodule
-  
-//module testt(opcode, immI);
-  //input [6:0] opcode;
-  //output immI;
-  //and(immI, opcode[2], opcode[3], opcode[4]);
-//endmodule
