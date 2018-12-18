@@ -2,7 +2,7 @@ module test;
   reg [31:0] entrada; 
   output [31:0] salida;
   
-  ComplementoA2 s32b1(entrada, salida);
+  ComplementoA2 CA2_1(entrada, salida);
   
   initial begin 
     entrada = 32'b000001111111111110000000000000; 
