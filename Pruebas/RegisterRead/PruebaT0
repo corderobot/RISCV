@@ -1,0 +1,15 @@
+module test;
+  reg [31:0] t0, zero;
+  output [31:0] rs1, rs2;
+  
+  RegisterRead RR(zero,zero,zero,zero,t0,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,zero,5'b00101, 5'b00101, rs1, rs2); 
+  
+  initial begin 
+    t0 = 32'b00000000000000000000000000000111; 
+    zero = 32'b00000000000000000000000000000000;
+    #10 $stop; 
+  end 
+  initial
+    $monitor("At time %t, t0 = %b",
+             $time, rs1);
+endmodule
