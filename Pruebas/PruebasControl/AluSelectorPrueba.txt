@@ -1,0 +1,26 @@
+module test;
+  reg [31:0] instruction;
+  wire [3:0] aluChoice, srlEn, addEn, andEn, orEn, xorEn, sltEn, mulEn, mulhEn, divEn, remEn, subEn;
+  
+  srlSelector srlS(instruction, srlEn);
+	addSelector addS(instruction, addEn);
+	andSelector andS(instruction, andEn);
+	orSelector orS(instruction, orEn);
+	xorSelector xorS(instruction, xorEn);
+	sltSelector sltS(instruction, sltEn);
+	mulSelector mulS(instruction, mulEn);
+	mulhSelector mulhS(instruction, mulhEn);
+	divSelector divS(instruction, divEn);
+	remSelector remS(instruction, remEn);
+	subSelector subS(instruction, subEn);
+  aluSelectorControll asdf1(instruction, aluChoice);
+  
+  initial begin
+    //				0000 0000 0000 0000 0101 0000 0011 0011
+    instruction = 32'b00010010001101000101111110110111;
+    #1 $stop; 
+  end 
+  initial
+    $monitor("slr = %b \n add = %b \n and = %b \n or = %b \n xor = %b \n slt = %b \n mul = %b \n mulh = %b \n div = %b \n rem = %b \n sub = %b \n aluChoice = %b",
+             srlEn, addEn, andEn, orEn, xorEn, sltEn, mulEn, mulhEn, divEn, remEn, subEn, aluChoice);
+endmodule

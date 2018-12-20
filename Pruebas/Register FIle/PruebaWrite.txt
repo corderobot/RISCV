@@ -1,0 +1,21 @@
+module test;
+  reg [31:0] writeData;
+  reg [4:0] writeRegister;
+  reg writeEnable;
+  
+  wire [31:0] registerEnable, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31;
+
+  registerWrite rw(writeData, writeRegister, writeEnable, registerEnable, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31);
+  
+  //demultiplexor1bit_1_32 asdf(in, signal, out);
+  
+  initial begin 
+    writeData = 'h12345678;
+    writeEnable = 1'b1; 
+    writeRegister = 5'b11111; 
+    #20 $stop; 
+  end 
+  initial
+    $monitor("At time %t, x0 = %h, x0en = %b",
+             $time, x0, registerEnable);
+endmodule
