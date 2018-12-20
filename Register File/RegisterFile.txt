@@ -1,0 +1,251 @@
+//Universidad Galileo
+//Rodrigo Cordero
+//Kevin Hernandez
+
+//Semi flip flop tipo RS, modificado y ajustado para este procesador
+module flip_flop_RS(clk, enable, set, clear, dataQ);
+  input clk, set, clear, enable;
+  output dataQ;
+  wire aux1, aux2, aux3, aux4, trueSignal, allowWrite, tsn, clearN; //tsn = true signal negado, clearN = clear negado
+  
+  not(tsn, trueSignal);
+  not(clearN, clear);
+  
+  and(allowWrite, clk, enable);
+  and(trueSignal, set, clearN);
+  
+  nand(aux1, allowWrite, trueSignal);
+  nand(aux2, allowWrite, tsn);
+  nand(aux3, aux1, aux4);
+  nand(aux4, aux2, aux3);
+  assign dataQ = aux3;
+endmodule
+
+module registro32_bits(clk, enable, in, clear, out);
+  input clk, enable, clear;
+  input [31:0] in;
+  output [31:0] out;
+  
+  flip_flop_RS ffrs0(clk, enable, in[0], clear, out[0]);
+  flip_flop_RS ffrs1(clk, enable, in[1], clear, out[1]);
+  flip_flop_RS ffrs2(clk, enable, in[2], clear, out[2]);
+  flip_flop_RS ffrs3(clk, enable, in[3], clear, out[3]);
+  flip_flop_RS ffrs4(clk, enable, in[4], clear, out[4]);
+  flip_flop_RS ffrs5(clk, enable, in[5], clear, out[5]);
+  flip_flop_RS ffrs6(clk, enable, in[6], clear, out[6]);
+  flip_flop_RS ffrs7(clk, enable, in[7], clear, out[7]);
+  flip_flop_RS ffrs8(clk, enable, in[8], clear, out[8]);
+  flip_flop_RS ffrs9(clk, enable, in[9], clear, out[9]);
+  flip_flop_RS ffrs10(clk, enable, in[10], clear, out[10]);
+  flip_flop_RS ffrs11(clk, enable, in[11], clear, out[11]);
+  flip_flop_RS ffrs12(clk, enable, in[12], clear, out[12]);
+  flip_flop_RS ffrs13(clk, enable, in[13], clear, out[13]);
+  flip_flop_RS ffrs14(clk, enable, in[14], clear, out[14]);
+  flip_flop_RS ffrs15(clk, enable, in[15], clear, out[15]);
+  flip_flop_RS ffrs16(clk, enable, in[16], clear, out[16]);
+  flip_flop_RS ffrs17(clk, enable, in[17], clear, out[17]);
+  flip_flop_RS ffrs18(clk, enable, in[18], clear, out[18]);
+  flip_flop_RS ffrs19(clk, enable, in[19], clear, out[19]);
+  flip_flop_RS ffrs20(clk, enable, in[20], clear, out[20]);
+  flip_flop_RS ffrs21(clk, enable, in[21], clear, out[21]);
+  flip_flop_RS ffrs22(clk, enable, in[22], clear, out[22]);
+  flip_flop_RS ffrs23(clk, enable, in[23], clear, out[23]);
+  flip_flop_RS ffrs24(clk, enable, in[24], clear, out[24]);
+  flip_flop_RS ffrs25(clk, enable, in[25], clear, out[25]);
+  flip_flop_RS ffrs26(clk, enable, in[26], clear, out[26]);
+  flip_flop_RS ffrs27(clk, enable, in[27], clear, out[27]);
+  flip_flop_RS ffrs28(clk, enable, in[28], clear, out[28]);
+  flip_flop_RS ffrs29(clk, enable, in[29], clear, out[29]);
+  flip_flop_RS ffrs30(clk, enable, in[30], clear, out[30]);
+  flip_flop_RS ffrs31(clk, enable, in[31], clear, out[31]);
+endmodule
+
+module demultiplexor1bit_1_32(in, signal, out);
+  input in;
+  input [4:0] signal;
+  output [31:0] out;
+  wire s0, s1, s2, s3, s4; //Señales de signal negadas
+  
+  not(s0, signal[0]);
+  not(s1, signal[1]);
+  not(s2, signal[2]);
+  not(s3, signal[3]);
+  not(s4, signal[4]);
+  
+  //-----------------------
+  
+  and(out[0], s4, s3, s2, s1, s0);
+  and(out[1], s4, s3, s2, s1, signal[0]);
+  and(out[2], s4, s3, s2, signal[1], s0);
+  and(out[3], s4, s3, s2, signal[1], signal[0]);
+  
+  and(out[4], s4, s3, signal[2], s1, s0);
+  and(out[5], s4, s3, signal[2], s1, signal[0]);
+  and(out[6], s4, s3, signal[2], signal[1], s0);
+  and(out[7], s4, s3, signal[2], signal[1], signal[0]);
+  
+  and(out[8], s4, signal[3], s2, s1, s0);
+  and(out[9], s4, signal[3], s2, s1, signal[0]);
+  and(out[10], s4, signal[3], s2, signal[1], s0);
+  and(out[11], s4, signal[3], s2, signal[1], signal[0]);
+  and(out[12], s4, signal[3], signal[2], s1, s0);
+  and(out[13], s4, signal[3], signal[2], s1, signal[0]);
+  and(out[14], s4, signal[3], signal[2], signal[1], s0);
+  and(out[15], s4, signal[3], signal[2], signal[1], signal[0]);
+  
+  and(out[16], signal[4], s3, s2, s1, s0);
+  and(out[17], signal[4], s3, s2, s1, signal[0]);
+  and(out[18], signal[4], s3, s2, signal[1], s0);
+  and(out[19], signal[4], s3, s2, signal[1], signal[0]);
+  and(out[20], signal[4], s3, signal[2], s1, s0);
+  and(out[21], signal[4], s3, signal[2], s1, signal[0]);
+  and(out[22], signal[4], s3, signal[2], signal[1], s0);
+  and(out[23], signal[4], s3, signal[2], signal[1], signal[0]);
+  and(out[24], signal[4], signal[3], s2, s1, s0);
+  and(out[25], signal[4], signal[3], s2, s1, signal[0]);
+  and(out[26], signal[4], signal[3], s2, signal[1], s0);
+  and(out[27], signal[4], signal[3], s2, signal[1], signal[0]);
+  and(out[28], signal[4], signal[3], signal[2], s1, s0);
+  and(out[29], signal[4], signal[3], signal[2], s1, signal[0]);
+  and(out[30], signal[4], signal[3], signal[2], signal[1], s0);
+  and(out[31], signal[4], signal[3], signal[2], signal[1], signal[0]);
+  
+endmodule
+
+//-----------Register Write--------------
+
+module registerWriteEnables(writeEnable, wreg, enables);
+  input writeEnable;
+  input [4:0] wreg;
+  output [31:0] enables;
+  
+  demultiplexor1bit_1_32 dm0(writeEnable, wreg, enables);
+  
+endmodule
+
+module registerWriteData(in, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31);
+  input [31:0] in;
+  output [31:0] x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31;
+  
+  assign x0 = in;
+  assign x1 = in;
+  assign x2 = in;
+  assign x3 = in;
+  assign x4 = in;
+  assign x5 = in;
+  assign x6 = in;
+  assign x7 = in;
+  assign x8 = in;
+  assign x9 = in;
+  assign x10 = in;
+  assign x11 = in;
+  assign x12 = in;
+  assign x13 = in;
+  assign x14 = in;
+  assign x15 = in;
+  assign x16 = in;
+  assign x17 = in;
+  assign x18 = in;
+  assign x19 = in;
+  assign x20 = in;
+  assign x21 = in;
+  assign x22 = in;
+  assign x23 = in;
+  assign x24 = in;
+  assign x25 = in;
+  assign x26 = in;
+  assign x27 = in;
+  assign x28 = in;
+  assign x29 = in;
+  assign x30 = in;
+  assign x31 = in;
+  
+endmodule
+
+module registerWrite(writeData, writeRegister, writeEnable, registerEnable, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31);
+  input [31:0] writeData;
+  input [4:0] writeRegister;
+  input writeEnable;
+  output [31:0] registerEnable, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31;
+  
+  registerWriteEnables rwe(writeEnable, writeRegister, registerEnable);
+  registerWriteData rwd(writeData, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31);
+  
+endmodule
+
+
+//----------------Register File-------------------
+
+module registerFile(rr1, rr2, wr, wd, we, clk, rd1, rd2);
+  
+  input [4:0] rr1, rsr, wr;
+  //rr1 = read_register1, rr2 = read register2, wr = write register
+  
+  input we, clk;
+  //we = write enable, clk = clock
+ 
+  input [31:0] wd;
+  //wd = write data
+  
+  output [31:0] rd1, rd2;
+  //rr1 = read data 1, rr2 = read data 2
+  
+  wire [31:0] wx0, wx1, wx2, wx3, wx4, wx5, wx6, wx7, wx8, wx9, wx10, wx11, wx12, wx13, wx14, wx15, wx16, wx17, wx18, wx19, wx20, wx21, wx22, wx23, wx24, wx25, wx26, wx27, wx28, wx29, wx30, wx31,  re;
+  //cables para register write
+  //input de los registros
+  //re = register enable
+  
+  wire[31:0] rx0, rx1, rx2, rx3, rx4, rx5, rx6, rx7, rx8, rx9, rx10, rx11, rx12, rx13, rx14, rx15, rx16, rx17, rx18, rx19, rx20, rx21, rx22, rx23, rx24, rx25, rx26, rx27, rx28, rx29, rx30, rx31;
+  //Cables de salida de los registros y para register read
+  //output de los registros
+
+  assign rx0 = 'h00000000;
+  
+  
+  wire aux;
+  assign aux = 1'b0;
+  
+  //---------Registers----------
+  registro32_bits x1(clk, re[1], wx1, aux, rx1);
+  registro32_bits x2(clk, re[2], wx2, aux, rx2);
+  registro32_bits x3(clk, re[3], wx3, aux, rx3);
+  registro32_bits x4(clk, re[4], wx4, aux, rx4);
+  registro32_bits x5(clk, re[5], wx5, aux, rx5);
+  registro32_bits x6(clk, re[6], wx6, aux, rx6);
+  registro32_bits x7(clk, re[7], wx7, aux, rx7);
+  registro32_bits x8(clk, re[8], wx8, aux, rx8);
+  registro32_bits x9(clk, re[9], wx9, aux, rx9);
+  registro32_bits x10(clk, re[10], wx10, aux, rx10);
+  registro32_bits x11(clk, re[11], wx11, aux, rx11);
+  registro32_bits x12(clk, re[12], wx12, aux, rx12);
+  registro32_bits x13(clk, re[13], wx13, aux, rx13);
+  registro32_bits x14(clk, re[14], wx14, aux, rx14);
+  registro32_bits x15(clk, re[15], wx15, aux, rx15);
+  registro32_bits x16(clk, re[16], wx16, aux, rx16);
+  registro32_bits x17(clk, re[17], wx17, aux, rx17);
+  registro32_bits x18(clk, re[18], wx18, aux, rx18);
+  registro32_bits x19(clk, re[19], wx19, aux, rx19);
+  registro32_bits x20(clk, re[20], wx20, aux, rx20);
+  registro32_bits x21(clk, re[21], wx21, aux, rx21);
+  registro32_bits x22(clk, re[22], wx22, aux, rx22);
+  registro32_bits x23(clk, re[23], wx23, aux, rx23);
+  registro32_bits x24(clk, re[24], wx24, aux, rx24);
+  registro32_bits x25(clk, re[25], wx25, aux, rx25);
+  registro32_bits x26(clk, re[26], wx26, aux, rx26);
+  registro32_bits x27(clk, re[27], wx27, aux, rx27);
+  registro32_bits x28(clk, re[28], wx28, aux, rx28);
+  registro32_bits x29(clk, re[29], wx29, aux, rx29);
+  registro32_bits x30(clk, re[30], wx30, aux, rx30);
+  registro32_bits x31(clk, re[31], wx31, aux, rx31);
+    
+    
+    
+  
+    
+    
+  //---------Register Write Area----------
+  
+  registerWrite(wd, wr, we, re, wx0, wx1, wx2, wx3, wx4, wx5, wx6, wx7, wx8, wx9, wx10, wx11, wx12, wx13, wx14, wx15, wx16, wx17, wx18, wx19, wx20, wx21, wx22, wx23, wx24, wx25, wx26, wx27, wx28, wx29, wx30, wx31);
+  
+  
+endmodule
