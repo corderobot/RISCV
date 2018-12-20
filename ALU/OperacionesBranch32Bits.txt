@@ -22,7 +22,7 @@ module BranchLessThan(A,B,Co);
   wire C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31, C32;
   wire B0, B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, B17, B18, B19, B20, B21, B22, B23, B24, B25, B26, B27, B28, B29, B30, B31;
   
-    xor(B0, B[0], 1);
+  xor(B0, B[0], 1);
   xor(B1, B[1], 1);
   xor(B2, B[2], 1);
   xor(B3, B[3], 1);
@@ -104,9 +104,9 @@ endmodule
 module BranchEqual(A,B,E);
   input [31:0] A,B;
   output E;
-  wire C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34, C35, C36, C37, C38, C39, C40, C41, C42, C43, C44, C45, C46, C47, C48, C49, C50, C51, C52, C53, C54, C55, C56, C57, C58, C59, C60, C61;
+  wire C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31;
 
-  
+
   xnor (C0, A[0], B[0]);
   xnor (C1, A[1], B[1]);
   xnor (C2, A[2], B[2]);
@@ -139,37 +139,7 @@ module BranchEqual(A,B,E);
   xnor (C29, A[29], B[29]);
   xnor (C30, A[30], B[30]);
   xnor (C31, A[31], B[31]);
-  and (C32, C0, C1);
-  and (C33, C2, C3);
-  and (C34, C4, C5);
-  and (C35, C6, C7);
-  and (C36, C8, C9);
-  and (C37, C10, C11);
-  and (C38, C12, C13);
-  and (C39, C14, C15);
-  and (C40, C16, C17);
-  and (C41, C18, C19);
-  and (C42, C20, C21);
-  and (C43, C22, C23);
-  and (C44, C24, C25);
-  and (C45, C26, C27);
-  and (C46, C28, C29);
-  and (C47, C30, C31);
-  and (C48, C32, C33);
-  and (C49, C34, C35);
-  and (C50, C36, C37);
-  and (C51, C38, C39);
-  and (C52, C40, C41);
-  and (C53, C42, C43);
-  and (C54, C44, C45);
-  and (C55, C46, C47);
-  and (C56, C48, C49);
-  and (C57, C50, C51);
-  and (C58, C52, C53);
-  and (C59, C54, C55);
-  and (C60, C56, C57);
-  and (C61, C58, C59);
-  and (E, C60, C61);
+  and (E, C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31);
 endmodule
 
 module BranchNotEqual(A,B,E);
