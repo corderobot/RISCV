@@ -1,4 +1,3 @@
-//Hola
 module medioSumador(x,y,S,C);
   input x,y;
   output S,C;
