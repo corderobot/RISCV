@@ -1,0 +1,26 @@
+module test;
+  reg [31:0] wd;
+  reg [4:0] wr, rd1, rd2;
+  reg we, clk, clear;
+  wire [31:0] rs1, rs2;
+  
+  registerFile rf(clk, wd, wr, we, rd1, rd2, rs1, rs2, clear);
+  
+  
+  initial clk = 1'b0;
+  always #10 clk = ~clk;
+  
+  initial clear = 1'b0;
+  initial begin 
+	#20 wd = 'h87654321; wr = 5'b00101; we = 1'b1; rd1 = 5'b00000; rd2 = 5'b00001;
+    $monitor("x0 = %h, x1 = %h", rs1, rs2);
+    #20 wd = 'h87654322; wr = 5'b00101; we = 1'b0; rd1 = 5'b00010; rd2 = 5'b01001;
+    $monitor("x2 = %h, x9 = %h", rs1, rs2);
+    #20 wd = 'h87654322; wr = 5'b00111; we = 1'b1; rd1 = 5'b00101; rd2 = 5'b00001;
+    $monitor("x5 = %h, x1 = %h", rs1, rs2);
+    #20 wd = 'h87654322; wr = 5'b00111; we = 1'b0; rd1 = 5'b00101; rd2 = 5'b00111;
+    $monitor("x5 = %h, x7 = %h", rs1, rs2);
+  end
+  
+  initial #80 $finish;
+endmodule
