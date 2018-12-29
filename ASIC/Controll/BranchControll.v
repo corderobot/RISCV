@@ -6,7 +6,7 @@
 module muliplexor1bit_2_1(inputA, inputB, sel, out);
   input inputA, inputB, sel;
   output out;
-  wire aux1, aux2, selN; //señal negado
+  wire aux1, aux2, selN; //seÃ±al negado
   
   not(selN, sel);
   and(aux1, inputA, sel);
