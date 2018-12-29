@@ -241,7 +241,7 @@ module aluSelectorControll(instruction, aluChoice);
   wire defaultSignal;
   
   //Uso de modulos anteriores
-  defaultSelector dS(instruction, defaultSignal); //señal para el multiplexor
+  defaultSelector dS(instruction, defaultSignal); //seÃ±al para el multiplexor
   
   	assign sllEn = 4'b0000;
   	srlSelector srlS(instruction, srlEn);
