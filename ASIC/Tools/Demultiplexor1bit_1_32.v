@@ -2,7 +2,7 @@ module demultiplexor1bit_1_32(in, signal, out);
   input in;
   input [4:0] signal;
   output [31:0] out;
-  wire s0, s1, s2, s3, s4; //Señales de signal negadas
+  wire s0, s1, s2, s3, s4; //SeÃ±ales de signal negadas
   
   not(s0, signal[0]);
   not(s1, signal[1]);
