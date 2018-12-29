@@ -64,61 +64,61 @@ module Multiplexor_1_5(I0, I1, I2, I3, I4, I5, I6, I7, I8, I9, I10, I11, I12, I1
   not (S3, sel[3]);
   not (S4, sel[4]);
   
-  // ¿Es 0?
+  // Â¿Es 0?
   and (C0, S0, S1, S2, S3, S4);
   
-  // ¿Es 1?
+  // Â¿Es 1?
   and (C1, sel[0], S1, S2, S3, S4);
   
-  // ¿Es 2?
+  // Â¿Es 2?
   and (C2, S0, sel[1], S2, S3, S4);
   
-  // ¿Es 3?
+  // Â¿Es 3?
   and (C3, sel[0], sel[1], S2, S3, S4);
   
-  // ¿Es 4?
+  // Â¿Es 4?
   and (C4, S0, S1, sel[2], S3, S4);
   
-  // ¿Es 5?
+  // Â¿Es 5?
   and (C5, sel[0], S1, sel[2], S3, S4);
   
-  // ¿Es 6?
+  // Â¿Es 6?
   and (C6, S0, sel[1], sel[2], S3, S4);
   
-  // ¿Es 7?
+  // Â¿Es 7?
   and (C7, sel[0], sel[1], sel[2], S3, S4);
   
-  // ¿Es 8?
+  // Â¿Es 8?
   and (C8, S0, S1, S2, sel[3], S4);
   
-  // ¿Es 9?
+  // Â¿Es 9?
   and (C9, sel[0], S1, S2, sel[3], S4);
   
-  // ¿Es 10?
+  // Â¿Es 10?
   and (C10, S0, sel[1], S2, sel[3], S4);
   
-  // ¿Es 11?
+  // Â¿Es 11?
   and (C11, sel[0], sel[1], S2, sel[3], S4);
   
-  // ¿Es 12?
+  // Â¿Es 12?
   and (C12, S0, S1, sel[2], sel[3], S4);
   
-  // ¿Es 13?
+  // Â¿Es 13?
   and (C13, sel[0], S1, sel[2], sel[3], S4);
   
-  // ¿Es 14?
+  // Â¿Es 14?
   and (C14, S0, sel[1], sel[2], sel[3], S4);
   
-  // ¿Es 15?
+  // Â¿Es 15?
   and (C15, sel[0], sel[1], sel[2], sel[3], S4);
   
-  // ¿Es 16?
+  // Â¿Es 16?
   and (C16, S0, S1, S2, S3, sel[4]);
   
-  // ¿Es 17?
+  // Â¿Es 17?
   and (C17, sel[0], S2, S3, sel[4]);
   
-  // ¿Es 18?
+  // Â¿Es 18?
   and (C18, S0, sel[1], S2, S3, sel[4]);
  
   and (C19, sel[0], sel[1], S2, S3, sel[4]);
