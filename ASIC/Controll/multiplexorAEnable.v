@@ -11,7 +11,7 @@ module multiplexorAEnable(opcode, enabledA);
   not(n4, opcode[4]);
   not(n6, opcode[6]);
   
-//	Señal para indicar si se activa dicho multiplexor
+//	SeÃ±al para indicar si se activa dicho multiplexor
   and(aux1, n2, n6);
   and(aux2, opcode[2], n3, n4);
   nor(enabledA, aux1, aux2);
