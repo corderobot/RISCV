@@ -1,26 +1,29 @@
-module testALU;
-  reg [31:0] X, Y;
-  reg [3:0] S;
-  wire equal;
-  wire [31:0] result;
+module ALU(input [31:0] X, Y,
+           input [3:0] S,
+           output reg equal,
+           output reg [31:0] result);
   
-  ALU ALU(X, Y, S, equal, result);
-  
-  initial 
-  	begin
-      $dumpfile("out.vcd");
-      $dumpvars(1, testALU);
-      
-      X = 32'b00000000000000000000000000001011;
-      Y = 32'b00000000000000000000000000000011;
-      S = 11; #25
-      S = 0; #25
-      S = 1; #25
-      S = 2; #25
-      X = 9;
-      Y = 9; 
+  reg [4:0] Y5;
+  always @(X, Y, S)
+    begin
+      assign Y5 = Y;
+      if(X == Y)
+        equal = 1'b1;
+      else
+        equal = 1'b0;
+      case (S)
+        4'b0000 : result = X << Y5;
+        4'b0001 : result = X >> Y5;
+        4'b0010 : result = X + Y;
+        4'b0011 : result = X & Y;
+        4'b0100 : result = X | Y;
+        4'b0101 : result = X ^ Y;
+        4'b0110 : result = X < Y;
+        4'b0111 : result = X * Y;
+        4'b1000 : result = X[31:16] * Y[31:16];
+        4'b1001 : result = X / Y;
+        4'b1010 : result = X % Y;
+        4'b1011 : result = X - Y;
+      endcase
     end
-  initial 
-    #250 $finish;
 endmodule
-  
