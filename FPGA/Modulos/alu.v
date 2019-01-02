@@ -5,14 +5,14 @@
 //
 //	Module Name: alu.v
 //	Project: FPGA RISC V
-//	Description: Verilog module wich describes the behaviour for Risc V's Alu
+//	Description: Verilog module which describes the behaviour for Risc V's Alu
 //
 //
 //	Update History:
-//	- 12/29/2018: Creation of the module
+//	- 12/29/2018: Creation of the module.
 //	- 01/01/2019: Changed module's name, changed the blocking assignation of the variables (Y5, XH, and YH) to unblocking assignation
 //		      and added a fork-join block for parallelization.
-//	- 02/01/2019: Deleted some variables for optimization
+//	- 02/01/2019: Deleted some variables for optimization.
 //
 //-------------------------------------------------------------------------//
 	
