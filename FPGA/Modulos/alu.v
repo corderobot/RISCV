@@ -10,8 +10,8 @@
 //
 //	Update History:
 //	- 12/29/2018: Creation of the module
-//         - 01/01/2019: Changed module's name, changed the blocking assignation of the variables (Y5, XH, and YH) to unblocking assignation
-//		   and added a fork-join block for parallelization.
+//	- 01/01/2019: Changed module's name, changed the blocking assignation of the variables (Y5, XH, and YH) to unblocking assignation
+//		      and added a fork-join block for parallelization.
 //
 //-------------------------------------------------------------------------//
 
