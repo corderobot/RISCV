@@ -26,11 +26,11 @@ module controll(clk, instruction, );
 	input [31:0] instruction;
 	//*************
 	output reg [3:0] ALUSelector;
-	output reg BrUnsigned, Bres, nop, WMemEnable;
+	output reg BrUnsigned, Bres, nop;
 	output reg [1:0] LoadSelector;
 	reg [3:0] wALUSelector;
 	reg wNop = 1'b0;
-	reg wandor, Inst6, Inst2, WME1;
+	reg wandor, Inst6, Inst2;
 	reg [31:0] wBControll;
 	reg [1:0] wLoadS, loadControll;
 	ALUSel aS(instruction, wALUSelector);
@@ -61,8 +61,6 @@ module controll(clk, instruction, );
 			wNop = wandor;
 			LoadSelector = wLoadS;
 			wLoadS = loadControll;
-			WMemEnable = WME1;
-			WME1 = WME;
 			//*****
 		end
 
