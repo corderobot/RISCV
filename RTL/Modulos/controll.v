@@ -12,7 +12,7 @@
 //	- 02/01/2019: Creation of the module and the following submodules: immGenSelector, muxABSelector,
 //								writeRegEnable, writeMemEnable, loadEnable, writeBack and pcEnable.
 //	- 03/01/2019: Modified the main module (controll), added a submodule description section and 
-//								the following submodules: unsignedOperations, loadControll, ALUSel, brControll.
+//								the following submodules: unsignedOperations, loadControll, ALUSel, brControll, Hazards.
 //
 //	Submodule Description:
 //	-	immGenSelector:			The purpose of this submodule is to send a signal that indicates to the
@@ -56,8 +56,14 @@ module controll(clk, instruction, );
 	loadControll 					lc(instruction, loadControllSignal);
 	ALUSel 								as(instruction, aluSelectorSignal);
 	brControll 						bc(wBControll, blt, beq, Bres);
+	Hazards                             Hazs(clk, rs1, rsd, rs2, ALU1AHaz, ALU1BHaz, MregAHaz, MregBHaz, ALU2AHaz, ALU2BHaz);
+	
+	//********HAZARDS**************
+	input [4:0] rs1, rs2, rsd;
+	output reg ALU1AHaz, ALU1BHaz, MregAHaz, MregBHaz, ALU2AHaz, ALU2BHaz;
+  	reg [4:0] rd0, rd1, rd2;
 
-	//*************
+	//************* 
 	output reg [3:0] ALUSelector;
 	output reg BrUnsigned, Bres, nop;
 	output reg [1:0] LoadSelector;
@@ -337,4 +343,45 @@ module brControll(input [31:0] Inst,
 				endcase
 			join
 								
+endmodule
+
+module Hazards(clk, rs1, rsd, rs2, ALU1AHaz, ALU1BHaz, MregAHaz, MregBHaz, ALU2AHaz, ALU2BHaz);
+  input [4:0] rs1, rs2, rsd;
+  input clk;
+  output reg ALU1AHaz, ALU1BHaz, MregAHaz, MregBHaz, ALU2AHaz, ALU2BHaz;
+  reg [4:0] rd0, rd1, rd2;
+  always @(posedge clk)
+    fork
+      begin
+        
+        rd2 = rd1;
+        rd1 = rd0;
+        rd0 = rsd;
+        
+        //ALU Hazard
+        ALU1AHaz = 1'b0;
+        ALU1BHaz = 1'b0;
+        if((rs1 == rd0) & (rd0 != 0))
+          ALU1AHaz = 1'b1;
+        else if ((rs2 == rd0) & (rd0 != 0))
+          ALU1BHaz = 1'b1;
+        	
+        //Reg Data Hazard
+        MregAHaz = 1'b0;
+        MregBHaz = 1'b0;
+        if((rs1 == rd2) & (rd2 != 0))
+          MregAHaz = 1'b1;
+        else if ((rs2 == rd2) & (rd2 != 0))
+          MregBHaz = 1'b1;
+        
+        //ALU2 Data Hazard
+        ALU2AHaz = 1'b0;
+        ALU2BHaz = 1'b0;
+        if((rs1 == rd1) & (rd1 != 0))
+          ALU2AHaz = 1'b1;
+        else if ((rs2 == rd1) & (rd1 != 0))
+          ALU2BHaz = 1'b1;
+      end
+    join
+  
 endmodule
