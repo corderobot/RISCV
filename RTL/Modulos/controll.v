@@ -13,22 +13,57 @@
 //								writeRegEnable, loadEnable, writeBack and pcEnable
 //	- 03/01/2019: Added a submodule description and the following submodules: unsignedOperations
 //
+//	-04/01/2019: Added LoadControll, AluSelector, BranchSelector submodules and their connections. Also added the 2nd stage of the pipeline
+
+//
 //	Submodule Description:
 //	- immGenSelector:	The purpose of this submodule is to send a signal to the Immediate Generator 
 //
 //-------------------------------------------------------------------------//
 
 module controll(clk, instruction, );
-	input clk;
+	input clk, blt, beq;
 	input [31:0] instruction;
+	//*************
+	output reg [3:0] ALUSelector;
+	output reg BrUnsigned, Bres, nop, WMemEnable;
+	output reg [1:0] LoadSelector;
+	reg [3:0] wALUSelector;
+	reg wNop = 1'b0;
+	reg wandor, Inst6, Inst2, WME1;
+	reg [31:0] wBControll;
+	reg [1:0] wLoadS, loadControll;
+	ALUSel aS(instruction, wALUSelector);
+	loadControll lC(instruction, loadControll);
+	brControll BC1(wBControll, blt, beq, Bres);
+	//**********
 
 	reg pipelines [0:7];
 	always @ (posedge clk)
 	fork
 		//-----Immediate Generator Selector-----//
 		begin
-
-
+			//*****
+			ALUSelector = wALUSelector;
+			BrUnsigned = instruction[13];
+			if(~wNop)
+				begin
+					wBControll = instruction;
+					wandor = ((instruction[6] & instruction[2]) | (Bres & instruction[6] & ~instruction[2]));
+				end
+			else if(wNop)
+				begin
+					wandor = 1'b0;
+					wBControll = 32'b0;
+					WME1 = 1'b0;
+				end
+			nop = wandor;
+			wNop = wandor;
+			LoadSelector = wLoadS;
+			wLoadS = loadControll;
+			WMemEnable = WME1;
+			WME1 = WME;
+			//*****
 		end
 
 
@@ -189,4 +224,87 @@ module unsignedOperations(clk, nop, instruction);
 		pipeline = 0;
 	else
 		pipeline = ((~instruction[30] & instruction[14] & ~instruction[13]) | (~instruction[14] & instruction[13])) & instruction[12] & instruction[4] & ~instruction[2];
+endmodule
+
+module loadControll(input [31:0] Inst,
+                    output reg [1:0] loadMux);
+  
+  always @(Inst)
+    case ({Inst[14], Inst[13], Inst[12]})
+      3'b000: loadMux = 0;
+      3'b001: loadMux = 1;
+      3'b010: loadMux = 2;
+      default: loadMux = 0;
+    endcase
+endmodule
+
+module ALUSel(input [31:0] Inst,
+              output reg [3:0] ALUSelOut);
+  
+  reg wiSll, wiSlr, wiAdd, wiAnd1, wiAnd2, wiAnd3, wiAnd4, wiOr, wiXor, wiMul, wiMulh, wiDiv, wiRem, wiSub, wiSlt;
+  
+  always @(Inst)
+      fork
+        case (Inst[0] & Inst[1])
+          1'b0 : ALUSelOut = 2;
+          1'b1 : 
+            begin
+              wiSll = 1'b0; //Sll
+              
+              wiSlr = Inst[14] & ~Inst[13] & Inst[12] & Inst[4] & ~Inst[2]; // Slr
+            
+              wiAdd = (((~Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4]) & ((~Inst[30] & ~Inst[25] & Inst[5] & ~Inst[2]) |  ~Inst[5])) | ~Inst[4]);
+            
+              wiAnd1 = (Inst[14] & Inst[13] & Inst[12] & Inst[4]);
+              wiAnd2 = (Inst[5] & ~Inst[2]);
+              wiAnd3 = wiAnd1 | wiAnd2;
+              wiAnd4 = wiAnd1 & wiAnd3; //And
+            
+               wiOr = ((Inst[14] & Inst[13] & ~Inst[12] & Inst[4] & ((~Inst[25] & Inst[5] & ~Inst[2]) | ~Inst[5]))); // Or
+            
+               wiXor = ((Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4] & ((~Inst[25] & Inst[5] & ~Inst[2]) | ~Inst[5]))); // Xor
+            
+              wiSlt = (~Inst[14] & Inst[13] & Inst[4] & ~Inst[2]); // Slt
+            
+              wiMul = ((~Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4] & ~Inst[30] & Inst[25] & Inst[5] & ~Inst[2])); // Mul
+            
+              wiMulh = (~Inst[14] & ~Inst[13] & Inst[12] & Inst[4] & Inst[25] & Inst[5] & ~Inst[2]); // Mulh
+            
+              wiDiv = ((Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4] & Inst[25] & Inst[5] & ~Inst[2])); // Div
+            
+              wiRem = ((Inst[14] & Inst[13] & ~Inst[12] & Inst[4] & Inst[25] & Inst[5] & ~Inst[2])); // Rem
+            
+              wiSub = ((~Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4] & Inst[30] & ~Inst[25] & Inst[5] & ~Inst[2])); // Sub
+              
+              
+              ALUSelOut = wiSll | (wiSlr * 1) | (wiAdd * 2) | (wiAnd4 * 3) | (wiOr * 4) | (wiXor * 5) | (wiMul * 7) |  (wiMulh * 8) | (wiDiv * 9) | (wiRem * 10) | (wiSub * 11) | (wiSlt * 6);
+            end
+        endcase
+      join
+endmodule
+
+module brControll(input [31:0] Inst,
+                  input blt, beq, 
+                  output reg result);
+  
+  always @(Inst)
+      fork
+        case(~Inst[12])
+          1'b0:
+            begin
+              if(~Inst[14])
+                result = ~beq;
+              else
+                result = ~blt;
+            end
+          1'b1:
+              begin
+                if(~Inst[14])
+                  result = beq;
+                else
+                  result = blt;
+              end
+        endcase
+      join
+                
 endmodule
