@@ -10,94 +10,60 @@
 //
 //	Update History:
 //	- 02/01/2019: Creation of the module and the following submodules: immGenSelector, muxABSelector,
-//								writeRegEnable, writeMemEnable, loadEnable, writeBack and pcEnable.
-//	- 03/01/2019: Modified the main module (controll), added a submodule description section and 
-//								the following submodules: unsignedOperations, loadControll, ALUSel, brControll.
+//                writeRegEnable, writeMemEnable, loadEnable, writeBack and pcEnable.
+//	- 03/01/2019: Modified the main module (controll), added a submodule description and 
+//                the following submodules: unsignedOperations, loadControll, ALUSel, brControll.
+//	- 04/01/2019: Added the submodules brUnsigned and nopControll, modified the main module (controll)
+//                and the following submodules: loadControll, ALUSel and brControll.
+//	- 05/01/2019: Added the submodule Hazards and modified the main module (controll).
 //
 //	Submodule Description:
-//	-	immGenSelector:			The purpose of this submodule is to send a signal that indicates to the
-//												Immediate Generator wich type of immediate to generate.
-//	-	muxABSelector:			Submodule wich tells to the multiplexor A and B wich data should let it 'pass'.
-//	-	writeRegEnable:			The sole purpose of this module is to let values be written on the Register File.
-//	-	writeMemEnable:			The sole purpose of this module is to let values be written on the memory.
-//	-	loadEnable:					The purpose of this module is to send a signal to another module in
-//												charge of inserting 'bubles' (hazard solution of this processor).
-//	-	writeBack:					Submodule wich tells the Write Back Multiplexor wich input should pass.
-//	-	pcEnable:						Submodule in charge of generating a signal wich tells to the PC multiplexor
-//												if the PC input should pass.
-//	-	unsignedOperations:	The purpose is to send a signal to the ALU wich tells if the operations should
+//	- immGenSelector:     The purpose of this submodule is to send a signal that indicates to the
+//                        Immediate Generator wich type of immediate to generate.
+//	- muxABSelector:      Submodule wich tells to the multiplexor A and B wich data should let it 'pass'.
+//	- writeRegEnable:     The sole purpose of this module is to let values be written on the Register File.
+//	- writeMemEnable:     The sole purpose of this module is to let values be written on the memory.
+//	- loadEnable:         The purpose of this module is to send a signal to another module in
+//                        charge of inserting 'bubles' (hazard solution of this processor).
+//	- writeBack:          Submodule wich tells the Write Back Multiplexor wich input should pass.
+//	- pcEnable:           Submodule in charge of generating a signal wich tells to the PC multiplexor
+//                        if the PC input should pass.
+//	- unsignedOperations: The purpose is to send a signal to the ALU wich tells if the operations should
 //												be done with unsigned inputs.
-//	-	loadControll:				Submodule wich indicates to the Load Selector Multiplexor wich load should pass.
-//	-	ALUSel:							The purpose of this module is to indicate to the ALU wich operation shall be done.
-//	-	brControll:					Submodule in charge of sending a signal if the branch was succesfully done or not.
+//	- loadControll:       Submodule wich indicates to the Load Selector Multiplexor wich load should pass.
+//	- ALUSel:             The purpose of this module is to indicate to the ALU wich operation shall be done.
+//	- brControll:         Submodule in charge of sending a signal if the branch was succesfully done or not.
+//	- brUnsigned:         Submodule in charge of determining if a branch should be done with unsigned values.
+//	- nopControll:        The purpose of this submodule is to send a signal to all the pipeline registers to reset their values.
+//	- Hazards:            The purpose of this submodule is to send signals if the respective hazards have been activated.
 //
 //-------------------------------------------------------------------------//
 
-module controll(clk, instruction, );
+module controll(clk, instruction, blt, beq, writeRegEnableSignal, writeMemEnableSignal, loadEnableSignal, pcEnableSignal, unsignedOperationsSignal, nopSignal, brUnsignedSignal, brControllSignal, muxABSelectorSignal, writeBackSignal, loadControllSignal, aluSelectorSignal, immGenSelectorSignal);
 	//-----Controll Section-----//
-	//-----Not final version-----//
 	input clk, blt, beq;
+	input [4:0] rs1, rs2, rsd;
 	input [31:0] instruction;
 
-	output writeRegEnableSignal, writeMemEnableSignal, loadEnableSignal, pcEnableSignal, unsignedOperationsSignal, nopSignal;
+	output writeRegEnableSignal, writeMemEnableSignal, loadEnableSignal, pcEnableSignal, unsignedOperationsSignal, nopSignal, brUnsignedSignal, brControllSignal, alu1AHazSignal, alu1BHazSignal, alu2AHazSignal, alu2BHazSignal, mregAHazSignal, mregBHazSignal;
 	output [1:0] muxABSelectorSignal, writeBackSignal, loadControllSignal;
-	output [4:0] immGenSelectorSignal, aluSelectorSignal;
+	output [3:0] aluSelectorSignal;
+	output [4:0] immGenSelectorSignal;
 
-	wire branchResult;
-
-	immGenSelector 				igs(clk, nopSignal, instruction[6:0], immGenSelectorSignal);
-	muxABSelector 				mabs(clk, nopSignal, instruction[6:0], muxABSelectorSignal);
-	writeRegEnable 				wre(clk, nopSignal, instruction[6:0], writeRegEnableSignal);
-	writeMemEnable 				wme(clk, nopSignal, instruction[6:0], writeMemEnableSignal);
-	loadEnable 						le(clk, instruction[6:0], loadEnableSignal);
-	writeBack							wb(clk, instruction[6:0], writeBackSignal);
-	pcEnable 							pce(clk, nopSignal, branchResult, instruction[6:0], pcEnableSignal);
-	unsignedOperations 		uo(clk, nopSignal, instruction);
-	loadControll 					lc(instruction, loadControllSignal);
-	ALUSel 								as(instruction, aluSelectorSignal);
-	brControll 						bc(wBControll, blt, beq, Bres);
-
-	//*************
-	output reg [3:0] ALUSelector;
-	output reg BrUnsigned, Bres, nop;
-	output reg [1:0] LoadSelector;
-	reg [3:0] wALUSelector;
-	reg wNop = 1'b0;
-	reg wandor, Inst6, Inst2;
-	reg [31:0] wBControll;
-	reg [1:0] wLoadS, loadControll;
-	
-	
-	//**********
-
-	reg pipelines [0:7];
-	always @ (posedge clk)
-	fork
-		//-----Immediate Generator Selector-----//
-		begin
-			//*****
-			ALUSelector = wALUSelector;
-			BrUnsigned = instruction[13];
-			if(~wNop)
-				begin
-					wBControll = instruction;
-					wandor = ((instruction[6] & instruction[2]) | (Bres & instruction[6] & ~instruction[2]));
-				end
-			else if(wNop)
-				begin
-					wandor = 1'b0;
-					wBControll = 32'b0;
-					WME1 = 1'b0;
-				end
-			nop = wandor;
-			wNop = wandor;
-			LoadSelector = wLoadS;
-			wLoadS = loadControll;
-			//*****
-		end
-
-
-	join
+	immGenSelector        igs(clk, nopSignal, instruction[6:0], immGenSelectorSignal);
+	muxABSelector         mabs(clk, nopSignal, instruction[6:0], muxABSelectorSignal);
+	writeRegEnable        wre(clk, nopSignal, instruction[6:0], writeRegEnableSignal);
+	writeMemEnable        wme(clk, nopSignal, instruction[6:0], writeMemEnableSignal);
+	loadEnable            le(clk, instruction[6:0], loadEnableSignal);
+	writeBack             wb(clk, instruction[6:0], writeBackSignal);
+	pcEnable              pce(clk, nopSignal, brControllSignal, instruction[6:0], pcEnableSignal);
+	unsignedOperations    uo(clk, nopSignal, instruction);
+	loadControll          lc(clk, instruction, loadControllSignal);
+	ALUSel                as(clk, instruction, aluSelectorSignal);
+	brUnsigned            bru(clk, instruction, brUnsignedSignal);
+	brControll            brc(clk, nopSignal, instruction, blt, beq, brControllSignal);
+	nopControll           nc(clk, brControllSignal, instruction, nopSignal);
+	Hazards               haz(clk, rs1, rs2, rsd, alu1AHazSignal, alu1BHazSignal, alu2AHazSignal, alu2BHazSignal, mregAHazSignal, mregBHazSignal);
 endmodule
 
 module immGenSelector(clk, nop, opcode, pipeline);
@@ -256,85 +222,152 @@ module unsignedOperations(clk, nop, instruction);
 		pipeline = ((~instruction[30] & instruction[14] & ~instruction[13]) | (~instruction[14] & instruction[13])) & instruction[12] & instruction[4] & ~instruction[2];
 endmodule
 
-module loadControll(input [31:0] Inst,
-										output reg [1:0] loadMux);
-	
-	always @(Inst)
-		case ({Inst[14], Inst[13], Inst[12]})
-			3'b000: loadMux = 0;
-			3'b001: loadMux = 1;
-			3'b010: loadMux = 2;
-			default: loadMux = 0;
-		endcase
+module loadControll(clk, inst, pipeline2);
+	//-----Load Controll signal-----//
+	input clk;
+	input [31:0] inst;
+	output [1:0] pipeline2;
+
+	reg [1:0] pipeline, pipeline2;
+
+	always @(posedge clk)
+		begin
+			pipeline2 = pipeline;
+			case ({inst[14], inst[13], inst[12]})
+				3'b000: pipeline = 0;
+				3'b001: pipeline = 1;
+				3'b010: pipeline = 2;
+				default: pipeline = 0;
+			endcase
+		end
 endmodule
 
-module ALUSel(input [31:0] Inst,
-							output reg [3:0] ALUSelOut);
+module ALUSel(clk, inst, pipeline);
+	//-----Alu Selector signal-----//
+	input clk;
+	input [31:0] inst;
+	output [3:0] pipeline;
+
+	reg [3:0] pipeline;
 	
-	reg wiSll, wiSlr, wiAdd, wiAnd1, wiAnd2, wiAnd3, wiAnd4, wiOr, wiXor, wiMul, wiMulh, wiDiv, wiRem, wiSub, wiSlt;
-	
-	always @(Inst)
+	always @(posedge clk)
 			fork
-				case (Inst[0] & Inst[1])
-					1'b0 : ALUSelOut = 2;
+				case (inst[0] & inst[1])
+					1'b0 : pipeline = 2;
 					1'b1 : 
-						begin
-							wiSll = 1'b0; //Sll
-							
-							wiSlr = Inst[14] & ~Inst[13] & Inst[12] & Inst[4] & ~Inst[2]; // Slr
-						
-							wiAdd = (((~Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4]) & ((~Inst[30] & ~Inst[25] & Inst[5] & ~Inst[2]) |  ~Inst[5])) | ~Inst[4]);
-						
-							wiAnd1 = (Inst[14] & Inst[13] & Inst[12] & Inst[4]);
-							wiAnd2 = (Inst[5] & ~Inst[2]);
-							wiAnd3 = wiAnd1 | wiAnd2;
-							wiAnd4 = wiAnd1 & wiAnd3; //And
-						
-							 wiOr = ((Inst[14] & Inst[13] & ~Inst[12] & Inst[4] & ((~Inst[25] & Inst[5] & ~Inst[2]) | ~Inst[5]))); // Or
-						
-							 wiXor = ((Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4] & ((~Inst[25] & Inst[5] & ~Inst[2]) | ~Inst[5]))); // Xor
-						
-							wiSlt = (~Inst[14] & Inst[13] & Inst[4] & ~Inst[2]); // Slt
-						
-							wiMul = ((~Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4] & ~Inst[30] & Inst[25] & Inst[5] & ~Inst[2])); // Mul
-						
-							wiMulh = (~Inst[14] & ~Inst[13] & Inst[12] & Inst[4] & Inst[25] & Inst[5] & ~Inst[2]); // Mulh
-						
-							wiDiv = ((Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4] & Inst[25] & Inst[5] & ~Inst[2])); // Div
-						
-							wiRem = ((Inst[14] & Inst[13] & ~Inst[12] & Inst[4] & Inst[25] & Inst[5] & ~Inst[2])); // Rem
-						
-							wiSub = ((~Inst[14] & ~Inst[13] & ~Inst[12] & Inst[4] & Inst[30] & ~Inst[25] & Inst[5] & ~Inst[2])); // Sub
-							
-							
-							ALUSelOut = wiSll | (wiSlr * 1) | (wiAdd * 2) | (wiAnd4 * 3) | (wiOr * 4) | (wiXor * 5) | (wiMul * 7) |  (wiMulh * 8) | (wiDiv * 9) | (wiRem * 10) | (wiSub * 11) | (wiSlt * 6);
-						end
+							if(inst[14] & ~inst[13] & inst[12] & inst[4] & ~inst[2]) //srl
+								pipeline = 1;
+							else if( (~inst[14] & ~inst[13] & ~inst[12] & inst[4] & ((~inst[30] & ~inst[25] & inst[5] & ~inst[2]) |  ~inst[5])) | ~inst[4]) //add
+								pipeline = 2;
+							else if( inst[14] & inst[13] & inst[12] & inst[4] & ((inst[5] & ~inst[2]) | ~inst[5]) ) //and
+								pipeline = 3;
+							else if( ((inst[14] & inst[13] & ~inst[12] & inst[4] & ((~inst[25] & inst[5] & ~inst[2]) | ~inst[5]))) ) //or
+								pipeline = 4;
+							else if( ((inst[14] & ~inst[13] & ~inst[12] & inst[4] & ((~inst[25] & inst[5] & ~inst[2]) | ~inst[5]))) ) //xor
+								pipeline = 5;
+							else if( ~inst[14] & inst[13] & inst[4] & ~inst[2] ) //slt
+								pipeline = 6;
+							else if( ~inst[14] & ~inst[13] & ~inst[12] & inst[4] & ~inst[30] & inst[25] & inst[5] & ~inst[2] ) //mul
+								pipeline = 7;
+							else if( ~inst[14] & ~inst[13] & inst[12] & inst[4] & inst[25] & inst[5] & ~inst[2] ) //mulh
+								pipeline = 8;
+							else if( inst[14] & ~inst[13] & ~inst[12] & inst[4] & inst[25] & inst[5] & ~inst[2] ) //div
+								pipeline = 9;
+							else if( inst[14] & inst[13] & ~inst[12] & inst[4] & inst[25] & inst[5] & ~inst[2] )
+								pipeline = 10;
+							else if( ~inst[14] & ~inst[13] & ~inst[12] & inst[4] & inst[30] & ~inst[25] & inst[5] & ~inst[2] )
+								pipeline = 11;
+							else
+								pipeline = 2;
 				endcase
 			join
 endmodule
 
-module brControll(input [31:0] Inst,
-									input blt, beq, 
-									output reg result);
+module brControll(clk, nop, inst, blt, beq, pipeline);
+	//-----Branch Controll signal-----//
+	input [31:0] inst;
+	input clk, nop, blt, beq;
+	output pipeline;
 	
-	always @(Inst)
+	reg pipeline;
+
+	always @(posedge clk)
+	if(nop)
+		pipeline = 0;
+	else
+		if(~inst[14] & ~inst[12])
+			pipeline = beq;
+		else if(~inst[14] & inst[12])
+			pipeline = ~beq;
+		else if(inst[14] & ~inst[12])
+			pipeline = blt;
+		else if(inst[14] & inst[12])
+			pipeline = ~blt;	
+endmodule
+
+module brUnsigned(clk, inst, pipeline);
+	//-----Branch Unsigned signal-----//
+	input clk;
+	input [31:0] inst;
+	output pipeline;
+
+	reg pipeline;
+
+	always @ (posedge clk)
+	pipeline = inst[13];
+endmodule
+
+module nopControll(clk, bres, inst, nop);
+	//-----Nop Controll signal-----//
+	input clk, bres;
+	input [31:0] inst;
+	output nop;
+
+	reg pipelineA, pipelineB, nop;
+
+	always @ (posedge clk)
+	begin
+		nop = (pipelineA & pipelineB) | (pipelineA & ~pipelineB & bres);
+		if(nop)
 			fork
-				case(~Inst[12])
-					1'b0:
-						begin
-							if(~Inst[14])
-								result = ~beq;
-							else
-								result = ~blt;
-						end
-					1'b1:
-							begin
-								if(~Inst[14])
-									result = beq;
-								else
-									result = blt;
-							end
-				endcase
+				pipelineA = 0;
+				pipelineB = 0;
 			join
-								
+		else
+			fork
+				pipelineA = inst[6];
+				pipelineB = inst[2];
+			join
+	end
+endmodule
+
+module Hazards(clk, rs1, rs2, rsd, ALU1AHaz, ALU1BHaz, ALU2AHaz, ALU2BHaz, MregAHaz, MregBHaz);
+	//-----Hazards signals-----//
+  input [4:0] rs1, rs2, rsd;
+  input clk;
+  output reg ALU1AHaz, ALU1BHaz, MregAHaz, MregBHaz, ALU2AHaz, ALU2BHaz;
+
+  reg [4:0] pipeline, pipeline2, pipeline3;
+
+  always @(posedge clk)
+  begin
+  	pipeline3 = pipeline2;
+  	pipeline2 = pipeline;
+  	pipeline = rsd;
+
+
+  	fork
+  		//Alu 1 Data Hazard
+			ALU1AHaz = (rs1 == pipeline) & ~(pipeline == 0);
+			ALU1BHaz = (rs2 == pipeline) & ~(pipeline == 0);
+
+			//Alu 2 Data Hazard
+			ALU2AHaz = (rs1 == pipeline2) & ~(pipeline2 == 0);
+			ALU2BHaz = (rs2 == pipeline2) & ~(pipeline2 == 0);
+
+			//Register Data Hazard
+			MregAHaz = (rs1 == pipeline3) & ~(pipeline3 == 0);
+			MregBHaz = (rs2 == pipeline3) & ~(pipeline3 == 0);
+  	join
+  end
 endmodule
