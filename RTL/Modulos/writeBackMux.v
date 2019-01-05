@@ -1,0 +1,36 @@
+//---------------------------Galileo University---------------------------//
+//	Main Collaborators:
+//	- Rodrigo Cordero
+//	- Kevin Hernandez
+//
+//	Module Name: writeBackMux.v
+//	Project: FPGA RISC V
+//	Description: Verilog module which describes the behaviour for the Write Back Multiplexor of 32 bits, 4 to 1.
+//
+//	Update History:
+//	- 01/05/2019: Creation of the module.
+//
+//	Variable Description:
+//	- clk: Processor's main clock.
+//	- muxSelector: Signal that indicates wich input should pass.
+//	- writeDataOrRegHazard: Signal that contains the value that will be written on the registers and its potentially the 
+//	                        register hazard signal.
+//
+//-------------------------------------------------------------------------//
+
+module writeBackMux(clk, muxSelector, writeDataOrRegHazard);
+	input clk;
+	input [1:0] muxSelector;
+	input [31:0] pc, alu, mem, imm;
+	output [31:0] writeDataOrRegHazard;
+
+	reg [31:0] writeDataOrRegHazard;
+
+	always @ (posedge clk)
+	case (muxSelector)
+		0: writeDataOrRegHazard = pc;
+		1: writeDataOrRegHazard = alu;
+		2: writeDataOrRegHazard = mem;
+		3: writeDataOrRegHazard = imm;
+	endcase
+endmodule
