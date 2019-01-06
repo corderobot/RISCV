@@ -9,22 +9,33 @@
 //
 //	Variables Description:
 //	- clk: Main processor's clock.
-//	- in: Current instruction address.
+//	- reset: Signal that resets the Program Counter.
 //	- fetch_addr: Current instruction address.
-//	- PCOut4: Added 4 to current instruction address.
+//	- ALUPC: Program Counter returned from the ALU.
+//	- PCMux: Signal that indicates wich Program Counter will be saved on the register.
 //
 //	Update History:
 //	- 01/01/2019: Creation of the module.
+//	- 01/05/2019: Added extra features and variable Description.
 //
 //------------------------------------------------------------------------//
 
-module programCounter(input clk,
-                      input[31:0] in, 
-                      output reg [31:0] fetch_addr, PCOut4);
+module programCounter(clk, reset, ALUPC, PCMux, fetch_addr);
+
+	input clk, PCMux, reset;
+	input [31:0] ALUPC;
+	output reg [31:0] fetch_addr;
+	
+	initial fetch_addr <= 0;
+
+	always @ (reset)
+	fetch_addr <= 0;
 
 	always @ (posedge clk)
-		fork
-      fetch_addr <= in;
-      PCOut4 <= 4 + in;
-		join
+	fork
+		if(PCMux)
+			fetch_addr = ALUPC;
+		else
+			fetch_addr <= fetch_addr + 4;
+	join
 endmodule
