@@ -16,7 +16,7 @@
 //	- 04/01/2019: Added the submodules brUnsigned and nopControll, modified the main module (controll)
 //                and the following submodules: loadControll, ALUSel and brControll.
 //	- 05/01/2019: Added the submodule Hazards and modified the main module (controll).
-//	- 07/01/2019: Fixed nopControll Submodule. Once nop is activated, it takes 1 more clock cycle;
+//	- 07/01/2019: Fixed nopControll Submodule. Once nop is activated, it takes 1 more clock cycle.
 //
 //	Submodule Description:
 //	- immGenSelector:     The purpose of this submodule is to send a signal that indicates to the
@@ -328,29 +328,28 @@ module nopControll(clk, bres, inst, nop);
 
 	always @ (posedge clk)
 	begin
-      
-      if(flag)
-        fork 
-          flag = 0;
-          nop = 0;
-        join
-      else
-        begin
-        nop = (pipelineA & pipelineB) | (pipelineA & ~pipelineB & bres);
-        
-      if(nop)
-			fork
-				pipelineA = 0;
-				pipelineB = 0;
-              	flag = 1;
-			join
-		else
-			fork
-				pipelineA = inst[6];
-				pipelineB = inst[2];
-			join
-        end
-	end
+	  
+	if(flag)
+		fork 
+		  flag = 0;
+		  nop = 0;
+		join
+	else
+		begin
+			nop = (pipelineA & pipelineB) | (pipelineA & ~pipelineB & bres);
+			if(nop)
+				fork
+					pipelineA = 0;
+					pipelineB = 0;
+					flag = 1;
+				join
+			else
+				fork
+					pipelineA = inst[6];
+					pipelineB = inst[2];
+				join
+			end
+		end
 endmodule
 
 module Hazards(clk, rs1, rs2, rsd, ALU1AHaz, ALU1BHaz, ALU2AHaz, ALU2BHaz, MregAHaz, MregBHaz);
@@ -363,13 +362,13 @@ module Hazards(clk, rs1, rs2, rsd, ALU1AHaz, ALU1BHaz, ALU2AHaz, ALU2BHaz, MregA
 
   always @(posedge clk)
   begin
-  	pipeline3 = pipeline2;
-  	pipeline2 = pipeline;
-  	pipeline = rsd;
+	pipeline3 = pipeline2;
+	pipeline2 = pipeline;
+	pipeline = rsd;
 
 
-  	fork
-  		//Alu 1 Data Hazard
+	fork
+		//Alu 1 Data Hazard
 			ALU1AHaz = (rs1 == pipeline) & ~(pipeline == 0);
 			ALU1BHaz = (rs2 == pipeline) & ~(pipeline == 0);
 
@@ -380,6 +379,6 @@ module Hazards(clk, rs1, rs2, rsd, ALU1AHaz, ALU1BHaz, ALU2AHaz, ALU2BHaz, MregA
 			//Register Data Hazard
 			MregAHaz = (rs1 == pipeline3) & ~(pipeline3 == 0);
 			MregBHaz = (rs2 == pipeline3) & ~(pipeline3 == 0);
-  	join
+	join
   end
 endmodule
