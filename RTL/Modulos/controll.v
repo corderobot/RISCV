@@ -16,6 +16,7 @@
 //	- 04/01/2019: Added the submodules brUnsigned and nopControll, modified the main module (controll)
 //                and the following submodules: loadControll, ALUSel and brControll.
 //	- 05/01/2019: Added the submodule Hazards and modified the main module (controll).
+//	- 07/01/2019: Fixed nopControll Submodule. Once nop is activated, it takes 1 more clock cycle;
 //
 //	Submodule Description:
 //	- immGenSelector:     The purpose of this submodule is to send a signal that indicates to the
@@ -323,21 +324,32 @@ module nopControll(clk, bres, inst, nop);
 	input [31:0] inst;
 	output nop;
 
-	reg pipelineA, pipelineB, nop;
+	reg pipelineA, pipelineB, nop, flag;
 
 	always @ (posedge clk)
 	begin
-		nop = (pipelineA & pipelineB) | (pipelineA & ~pipelineB & bres);
-		if(nop)
+      
+      if(flag)
+        fork 
+          flag = 0;
+          nop = 0;
+        join
+      else
+        begin
+        nop = (pipelineA & pipelineB) | (pipelineA & ~pipelineB & bres);
+        
+      if(nop)
 			fork
 				pipelineA = 0;
 				pipelineB = 0;
+              	flag = 1;
 			join
 		else
 			fork
 				pipelineA = inst[6];
 				pipelineB = inst[2];
 			join
+        end
 	end
 endmodule
 
