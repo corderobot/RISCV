@@ -9,6 +9,7 @@
 //
 //	Update History:
 //	- 01/05/2019: Creation of the module.
+//	- 01/11/2019: Fixed module's name and the nop's cycle. It takes now an extra cycle to accept a new value.
 //
 //	Variable Description:
 //	- clk: Processor's main clock.
@@ -20,21 +21,29 @@
 //
 //-------------------------------------------------------------------------//
 
-module registerWritePipeline(clk, nop, pc, pipeline2, pipeline3);
+module pcPipeline(clk, nop, pc, pipeline2, pipeline3);
 	input clk, nop;
 	input [31:0] pc;
 	output [31:0] pipeline2, pipeline3;
 
 	reg [31:0] pipeline, pipeline2, pipeline3;
 
+	reg flag;
+
+	initial flag = 0;
+
 	always @ (posedge clk)
-	fork
+	if(flag)
+		flag <= 0;
+	else
 		if(nop)
 			begin
 				pipeline3 = pipeline2 + 4;
+
 				fork
-					pipeline3 = 0;
 					pipeline2 = 0;
+					pipeline = 0;
+					flag = 1;
 				join
 			end
 		else
@@ -43,5 +52,4 @@ module registerWritePipeline(clk, nop, pc, pipeline2, pipeline3);
 				pipeline2 = pipeline;
 				pipeline = pc;
 			end
-	join
 endmodule
