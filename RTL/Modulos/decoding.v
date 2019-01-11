@@ -9,6 +9,7 @@
 //
 //	Update History:
 //	- 01/05/2019: Creation of the module.
+//	- 01/10/2019: Fixed nop's cycle. Now it takes an extra cycle after a nop signal.
 //
 //	Variable Description:
 //	- clk: Processor's main clock.
@@ -25,21 +26,33 @@
 module decoding(clk, nop, instruction, inst, rr1, rr2, rw, imm);
 	input clk, nop;
 	input [31:0] instruction;
-	output reg [4:0] rr1, rr2, rw;
-	output reg [24:0] imm;
-	output reg [31:0] inst;
+	output [4:0] rr1, rr2, rw;
+	output [24:0] imm;
+	output [31:0] inst;
 
 	reg [31:0] pipeline;
 
+	reg flag;
+
+	initial flag = 0;
+
 	always @ (posedge clk)
-	if(nop)
-		pipeline = 0;
-	else
-		fork
-			inst <= instruction;
-			rr1 <= pipeline[19:15];
-			rr2 <= pipeline[24:20];
-			rw <= pipeline[11:7];
-			imm <= pipeline[31:7];
-		join
+	begin
+		if(flag)
+			flag = 0;
+		else
+			if(nop)
+				fork
+					pipeline <= 0;
+					flag <= 1;
+				join
+			else
+					pipeline <= instruction;
+	end
+  
+	assign inst = pipeline;
+	assign rr1 = pipeline[19:15];
+	assign rr2 = pipeline[24:20];
+	assign rw = pipeline[11:7];
+	assign imm = pipeline[31:7];
 endmodule
