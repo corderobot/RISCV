@@ -11,6 +11,7 @@
 //	Update History:
 //	- 01/02/2019: Creation of the module.
 //  - 01/05/2019: Added pipeline, added the clk and nop inputs and a variable description section
+//	- 01/11/2019: Fixed nop's cycle. It takes now an extra cycle to accept a new value.
 //
 //	Variable Description:
 //	- clk: Processor's main clock.
@@ -24,12 +25,16 @@
 //
 //-------------------------------------------------------------------------//
 	
-module immGenerator(clk, nop, Inst, S, SB, U, UJ, immGenerated);
+module immGenerator(clk, nop, Inst, ILoad, S, SB, U, UJ, immGenerated);
 	input [24:0] Inst;
 	input ILoad, S, SB, U, UJ, clk, nop;
 	output reg [31:0] immGenerated;
 
 	reg [24:0] pipeline;
+
+	reg flag;
+
+	initial flag = 0;
 
 	always @ (posedge clk)
 	begin
@@ -71,9 +76,15 @@ module immGenerator(clk, nop, Inst, S, SB, U, UJ, immGenerated);
 				join
 		join
 
-		if(nop)
-			pipeline = 0;
+		if(flag)
+			flag <= 0;
 		else
-			pipeline = Inst;
+			if(nop)
+				fork
+					pipeline = 0;
+					flag = 1;
+				join
+			else
+				pipeline = Inst;
 	end
 endmodule
