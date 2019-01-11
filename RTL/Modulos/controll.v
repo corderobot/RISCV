@@ -16,7 +16,8 @@
 //	- 04/01/2019: Added the submodules brUnsigned and nopControll, modified the main module (controll)
 //                and the following submodules: loadControll, ALUSel and brControll.
 //	- 05/01/2019: Added the submodule Hazards and modified the main module (controll).
-//	- 07/01/2019: Fixed nopControll Submodule. Once nop is activated, it takes 1 more clock cycle.
+//	- 10/01/2019: Fixed the submodules: nopControll, brControll, writeRegEnable, writeMemEnable and muxABSelector. Once nop is activated, it takes 1 more clock cycle.
+//	- 11/01/2019: Fixed ALUSel, now it accepts sll and slli instructions.
 //
 //	Submodule Description:
 //	- immGenSelector:     The purpose of this submodule is to send a signal that indicates to the
@@ -54,7 +55,7 @@ module controll(clk, instruction, blt, beq, writeRegEnableSignal, writeMemEnable
 	immGenSelector        igs(clk, nopSignal, instruction[6:0], immGenSelectorSignal);
 	muxABSelector         mabs(clk, nopSignal, instruction[6:0], muxABSelectorSignal);
 	writeRegEnable        wre(clk, nopSignal, instruction[6:0], writeRegEnableSignal);
-	writeMemEnable        wme(clk, nopSignal, instruction[6:0], writeMemEnableSignal);
+	writeMemEnable        wme(clk, instruction[6:0], writeMemEnableSignal);
 	loadEnable            le(clk, instruction[6:0], loadEnableSignal);
 	writeBack             wb(clk, instruction[6:0], writeBackSignal);
 	pcEnable              pce(clk, nopSignal, brControllSignal, instruction[6:0], pcEnableSignal);
@@ -74,8 +75,14 @@ module immGenSelector(clk, nop, opcode, pipeline);
 	output [4:0] pipeline;
 
 	reg [4:0] pipeline;
+	reg flag;
+
+	initial flag = 1;
 
 	always @ (posedge clk)
+	if(flag)
+		flag = 0;
+	else
 		if(nop)
 			fork
 				pipeline[0] = 0;																		//Type I
@@ -83,6 +90,7 @@ module immGenSelector(clk, nop, opcode, pipeline);
 				pipeline[2] = 0;																		//Type U
 				pipeline[3] = 0;																		//Type SB
 				pipeline[4] = 0;																		//Type UJ
+				flag = 1;
 			join
 		else
 			fork
@@ -101,17 +109,24 @@ module muxABSelector(clk, nop, opcode, pipeline);
 	output [1:0] pipeline;
 
 	reg [1:0] pipeline;
-
+	reg flag;
+  
+	initial flag = 0;
+  
 	always @ (posedge clk)
+	if(flag)
+		flag = 0;
+	else
 		if(nop)
 			fork
-				pipeline[0] = 0;																																				//Multiplexor A
-				pipeline[1] = 0;																																				//Multiplexor B
+				pipeline[0] = 0;
+				pipeline[1] = 0;
+			  flag = 1;
 			join
 		else
 			fork
-				pipeline[0] = ~((~opcode[6] & ~opcode[2]) | (~opcode[4] & ~opcode[3] & opcode[2]));			//Multiplexor A
-				pipeline[1] = ~(opcode[5] & opcode[4] & ~opcode[2]);																		//Multiplexor B
+				pipeline[0] = ~((~opcode[6] & ~opcode[2]) | (~opcode[4] & ~opcode[3] & opcode[2]));
+				pipeline[1] = ~(opcode[5] & opcode[4] & ~opcode[2]);
 			join
 endmodule
 
@@ -121,22 +136,31 @@ module writeRegEnable(clk, nop, opcode, pipeline3);
 	input [6:0] opcode;
 	output pipeline3;
 
-	reg pipeline, pipeline2, pipeline3;
+	reg pipeline, pipeline2, pipeline3, flag;
+
+	initial flag = 0;
 
 	always @ (posedge clk)
 	begin
 		pipeline3 = pipeline2;
 		pipeline2 = pipeline;
-		if(nop)
-			pipeline = 0;
+		if(flag)
+			flag = 0; 
 		else
-			pipeline = (~opcode[5] | opcode[4] | opcode[2]) & opcode[1] & opcode[0];
+			if(nop)
+				fork
+					pipeline = 0;
+					flag = 1;
+				join
+			else
+				pipeline = (~opcode[5] | opcode[4] | opcode[2]) & opcode[1] & opcode[0];
+		
 	end
 endmodule
 
-module writeMemEnable(clk, nop, opcode, pipeline2);
+module writeMemEnable(clk, opcode, pipeline2);
 	//-----Write Memory Enable signal-----//
-	input clk, nop;
+	input clk;
 	input [6:0] opcode;
 	output pipeline2;
 
@@ -145,10 +169,7 @@ module writeMemEnable(clk, nop, opcode, pipeline2);
 	always @ (posedge clk)
 	begin
 		pipeline2 = pipeline;
-		if(nop)
-			pipeline = 0;
-		else
-			pipeline = ~opcode[6] & opcode[5] & ~opcode[4];
+		pipeline = ~opcode[6] & opcode[5] & ~opcode[4];
 	end
 endmodule
 
@@ -196,31 +217,47 @@ module pcEnable(clk, nop, bres, opcode, pipeline2);
 	output pipeline2;
 
 	reg [6:0] pipeline;
-	reg pipeline2;
+	reg pipeline2, flag;
+  
+	initial flag = 0;
 
 	always @ (posedge clk)
 	begin
 		pipeline2 = (bres | pipeline[2]) & pipeline[6];
-		if(nop)
-			pipeline = 7'b0000000;
+		if(flag)
+			flag = 0;
 		else
-			pipeline = opcode;
+		  if(nop)
+				fork
+					pipeline = 0;
+					flag = 1;
+				join
+		  else
+				pipeline = opcode;
 	end
 endmodule
 
-module unsignedOperations(clk, nop, instruction);
+module unsignedOperations(clk, nop, instruction, pipeline);
 	//-----Unsigned Operations for ALU signal-----//
 	input clk, nop;
 	input [31:0] instruction;
-	output pipeline;
+	output reg pipeline;
 
-	reg pipeline;
+	reg flag;
 
+	initial flag = 0;
+  
 	always @ (posedge clk)
-	if(nop)
-		pipeline = 0;
-	else
-		pipeline = ((~instruction[30] & instruction[14] & ~instruction[13]) | (~instruction[14] & instruction[13])) & instruction[12] & instruction[4] & ~instruction[2];
+		if(flag)  
+			flag = 0;
+		else
+		  if(nop)
+			fork
+			  pipeline = 0;
+			  flag = 1;
+			join
+		  else
+			  pipeline = ((~instruction[30] & instruction[14] & ~instruction[13]) | (~instruction[14] & instruction[13])) & instruction[12] & instruction[4] & ~instruction[2];
 endmodule
 
 module loadControll(clk, inst, pipeline2);
@@ -278,6 +315,8 @@ module ALUSel(clk, inst, pipeline);
 								pipeline = 10;
 							else if( ~inst[14] & ~inst[13] & ~inst[12] & inst[4] & inst[30] & ~inst[25] & inst[5] & ~inst[2] )
 								pipeline = 11;
+							else if( ~inst[14] & ~inst[13] & inst[12] & inst[4] & ( ( ~inst[25] & inst[5] & ~inst[2] ) | ~inst[5] ) )
+								pipeline = 0;
 							else
 								pipeline = 2;
 				endcase
@@ -290,20 +329,28 @@ module brControll(clk, nop, inst, blt, beq, pipeline);
 	input clk, nop, blt, beq;
 	output pipeline;
 	
-	reg pipeline;
+	reg pipeline, flag;
+
+	initial flag = 1;
 
 	always @(posedge clk)
-	if(nop)
-		pipeline = 0;
+	if(flag)
+		flag = 0;
 	else
-		if(~inst[14] & ~inst[12])
-			pipeline = beq;
-		else if(~inst[14] & inst[12])
-			pipeline = ~beq;
-		else if(inst[14] & ~inst[12])
-			pipeline = blt;
-		else if(inst[14] & inst[12])
-			pipeline = ~blt;	
+		if(nop)
+			fork
+				pipeline = 0;
+				flag = 1;
+			join
+		else
+			if(~inst[14] & ~inst[12])
+				pipeline = beq;
+			else if(~inst[14] & inst[12])
+				pipeline = ~beq;
+			else if(inst[14] & ~inst[12])
+				pipeline = blt;
+			else if(inst[14] & inst[12])
+				pipeline = ~blt;
 endmodule
 
 module brUnsigned(clk, inst, pipeline);
@@ -325,6 +372,8 @@ module nopControll(clk, bres, inst, nop);
 	output nop;
 
 	reg pipelineA, pipelineB, nop, flag;
+
+	initial flag = 0;
 
 	always @ (posedge clk)
 	begin
