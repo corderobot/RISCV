@@ -21,6 +21,7 @@
 //								and added a fork-join block for parallelization.
 //	- 02/01/2019: Deleted some variables for optimization, added variables and operations descriptions, added an unsigned
 //								input signal and modified the module to operate signed and unsigned bits.
+//	- 12/01/2019: Captured arithmetic hazard: divide by 0; and removed additional unsigned operations.
 //
 //-------------------------------------------------------------------------//
 	
@@ -28,7 +29,7 @@ module alu(input [31:0] X, Y,
 		   input [3:0] S,
 		   input un,
 		   output reg equal,
-           output [31:0] result);
+		   output [31:0] result);
 	
   wire signed [31:0] Xs, Ys;
   reg [31:0] partialResultUnsigned, partialResultSigned;
@@ -36,43 +37,41 @@ module alu(input [31:0] X, Y,
 	assign Ys = Y;
 	always @(X, Y, S, un)
 		  begin
-		  	
-		  	fork
-					if(X == Y)
-					  equal = 1'b1;
-					else
-					  equal = 1'b0;
-					case (S)
-						4'b0000 : partialResultSigned = Xs << Y[4:0];						//sll
-						4'b0001 : partialResultSigned = Xs >>> Y[4:0];						//sra
-						4'b0010 : partialResultSigned = Xs + Ys;									//add
-					  4'b0011 : partialResultSigned = Xs & Ys;									//and
-					  4'b0100 : partialResultSigned = Xs | Ys;									//or
-					  4'b0101 : partialResultSigned = Xs ^ Ys;									//Xor
-					  4'b0110 : partialResultSigned = Xs < Ys;									//slt
-					  4'b0111 : partialResultSigned = Xs * Ys;									//mul
-					  4'b1000 : partialResultSigned = Xs[31:16] * Ys[31:16];		//mulh
-					  4'b1001 : partialResultSigned = Xs / Ys;									//div
-					  4'b1010 : partialResultSigned = Xs % Ys;									//rem
-					  4'b1011 : partialResultSigned = Xs - Ys;									//substract
-					endcase
+			
+			fork
+				if(X == Y)
+					equal = 1'b1;
+				else
+					equal = 1'b0;
+				case (S)
+					4'b0000 : partialResultSigned = Xs << Y[4:0];						//sll
+					4'b0001 : partialResultSigned = Xs >>> Y[4:0];						//sra
+					4'b0010 : partialResultSigned = Xs + Ys;									//add
+					4'b0011 : partialResultSigned = Xs & Ys;									//and
+					4'b0100 : partialResultSigned = Xs | Ys;									//or
+					4'b0101 : partialResultSigned = Xs ^ Ys;									//Xor
+					4'b0110 : partialResultSigned = Xs < Ys;									//slt
+					4'b0111 : partialResultSigned = Xs * Ys;									//mul
+					4'b1000 : partialResultSigned = Xs[31:16] * Ys[31:16];		//mulh
+					4'b1001 : 
+						if(Ys == 0)
+							partialResultSigned = 0;
+						else
+							partialResultSigned = Xs / Ys;										//div
+					4'b1010 : 
+						if(Ys == 0)
+							partialResultSigned = 0;
+						else
+							partialResultSigned = Xs % Ys;										//rem
+				 	4'b1011 : partialResultSigned = Xs - Ys;									//substract
+				endcase
 
-					case (S)
-						4'b0000 : partialResultUnsigned = X << Y[4:0];						//sll
-						4'b0001 : partialResultUnsigned = X >> Y[4:0];						//sra
-						4'b0010 : partialResultUnsigned = X + Y;									//add
-					  4'b0011 : partialResultUnsigned = X & Y;									//and
-					  4'b0100 : partialResultUnsigned = X | Y;									//or
-					  4'b0101 : partialResultUnsigned = X ^ Y;									//xor
-					  4'b0110 : partialResultUnsigned = X < Y;									//slt
-					  4'b0111 : partialResultUnsigned = X * Y;									//mul
-					  4'b1000 : partialResultUnsigned = X[31:16] * Y[31:16];		//mulh
-					  4'b1001 : partialResultUnsigned = X / Y;									//div
-					  4'b1010 : partialResultUnsigned = X % Y;									//rem
-					  4'b1011 : partialResultUnsigned = X - Y;									//substract
-					endcase
-				join
-            
+				case (S)
+				  4'b0001 : partialResultUnsigned = X >> Y[4:0];						//sra
+				  4'b0110 : partialResultUnsigned = X < Y;									//slt
+				endcase
+			join
+			
 		  end
   mux32bits_2_to_1 m(partialResultSigned, partialResultUnsigned, un, result);
 endmodule
