@@ -9,6 +9,7 @@
 //
 //	Update History:
 //	- 01/05/2019: Creation of the module.
+//	- 01/12/2019: Fixed blt's assignment problem.
 //
 //	Variable Description:
 //	- un: signal that indicates if the values must be compared with unsigned values.
@@ -27,13 +28,22 @@ module brComparator(un, rr1, rr2, beq, blt);
 	reg signed [31:0] aux1, aux2;
 
 	always @ (un, rr1, rr2)
-	fork
-		beq = rr1 == rr2;
-		aux1 = rr1;
-		aux2 = rr2;
-		if(~un)
-			blt = aux1 < aux2;
+	begin
+		fork
+			beq = rr1 == rr2;
+			aux1 = rr1;
+			aux2 = rr2;
+		join
+		if(un)
+			if(rr1 < rr2)
+				blt = 1;
+			else
+				blt = 0;
 		else
-			blt = rr1 < rr2;
-	join
+			if(aux1 < aux2)
+				blt = 1;
+			else
+				blt = 0;
+			end
+	end
 endmodule
