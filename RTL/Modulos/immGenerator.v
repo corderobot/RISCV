@@ -38,12 +38,10 @@ module immGenerator(clk, clock, nop, Inst, ILoad, S, SB, U, UJ, immGenerated, LU
 	reg flag;
 
 	initial flag = 0;
-  
-  always @(posedge clk);
-  	LUI = immGenerated;
 
   always @ (posedge clock)
 	begin
+		LUI = immGenerated;
 		fork
 			if(ILoad)
 				fork
