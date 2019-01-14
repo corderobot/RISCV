@@ -10,11 +10,13 @@
 //
 //	Update History:
 //	- 01/02/2019: Creation of the module.
-//  - 01/05/2019: Added pipeline, added the clk and nop inputs and a variable description section
+//	- 01/05/2019: Added pipeline, added the clk and nop inputs and a variable description section
 //	- 01/11/2019: Fixed nop's cycle. It takes now an extra cycle to accept a new value.
+//	- 01/14/2019: Added LUI output.
 //
 //	Variable Description:
-//	- clk: Processor's main clock.
+//	- clk: Processor's secondary clock.
+//	- clock: Processor's secondary clock (Bubble Clock).
 //	- nop: Signal that indicates if the content of the pipeline register must be deleted.
 //	- Inst: Instruction to be executed.
 //	- S: Signal that indicates if an S type immediate should be generated.
@@ -22,21 +24,25 @@
 //	- U: Signal that indicates if an U type immediate should be generated.
 //	- UJ: Signal that indicates if an UJ type immediate should be generated.
 //	- immGenerated: Immediate generated.
+// 	- LUI: Load upper immediate.
 //
 //-------------------------------------------------------------------------//
 	
-module immGenerator(clk, nop, Inst, ILoad, S, SB, U, UJ, immGenerated);
+module immGenerator(clk, clock, nop, Inst, ILoad, S, SB, U, UJ, immGenerated, LUI);
 	input [24:0] Inst;
 	input ILoad, S, SB, U, UJ, clk, nop;
-	output reg [31:0] immGenerated;
+  	output reg [31:0] immGenerated, LUI;
 
 	reg [24:0] pipeline;
 
 	reg flag;
 
 	initial flag = 0;
+  
+  always @(posedge clk);
+  	LUI = immGenerated;
 
-	always @ (posedge clk)
+  always @ (posedge clock)
 	begin
 		fork
 			if(ILoad)
