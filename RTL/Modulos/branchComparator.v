@@ -44,6 +44,5 @@ module brComparator(un, rr1, rr2, beq, blt);
 				blt = 1;
 			else
 				blt = 0;
-			end
 	end
 endmodule
