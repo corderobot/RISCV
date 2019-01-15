@@ -30,7 +30,7 @@
 	
 module immGenerator(clk, clock, nop, Inst, ILoad, S, SB, U, UJ, immGenerated, LUI);
 	input [24:0] Inst;
-	input ILoad, S, SB, U, UJ, clk, nop;
+	input ILoad, S, SB, U, UJ, clk, ,clock, nop;
   	output reg [31:0] immGenerated, LUI;
 
 	reg [24:0] pipeline;
