@@ -10,6 +10,7 @@
 //	Update History:
 //	- 01/05/2019: Creation of the module.
 //	- 01/10/2019: Fixed nop's cycle. Now it takes an extra cycle after a nop signal.
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //	Variable Description:
 //	- clk: Processor's main clock.
@@ -34,8 +35,10 @@ module decoding(clk, nop, instruction, inst, rr1, rr2, rw, imm);
 
 	reg flag;
 
-	initial flag = 0;
-
+	initial fork
+		flag = 0;
+		pipeline = 0;
+	join
 	always @ (posedge clk)
 	begin
 		if(flag)
