@@ -10,6 +10,7 @@
 //	Update History:
 //	- 01/05/2019: Creation of the module.
 //	- 01/12/2019: Fixed blt's assignment problem.
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //	Variable Description:
 //	- un: signal that indicates if the values must be compared with unsigned values.
@@ -26,6 +27,13 @@ module brComparator(un, rr1, rr2, beq, blt);
 	output reg beq, blt;
 
 	reg signed [31:0] aux1, aux2;
+
+	initial fork
+		beq = 0;
+		blt = 0;
+		aux1 = 0;
+		aux2 = 0;
+	join
 
 	always @ (un, rr1, rr2)
 	begin
@@ -44,5 +52,6 @@ module brComparator(un, rr1, rr2, beq, blt);
 				blt = 1;
 			else
 				blt = 0;
+			end
 	end
 endmodule
