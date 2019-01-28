@@ -22,6 +22,7 @@
 //	- 02/01/2019: Deleted some variables for optimization, added variables and operations descriptions, added an unsigned
 //								input signal and modified the module to operate signed and unsigned bits.
 //	- 12/01/2019: Captured arithmetic hazard: divide by 0; and removed additional unsigned operations.
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //-------------------------------------------------------------------------//
 	
@@ -31,6 +32,12 @@ module alu(input [31:0] X, Y,
 		   output reg equal,
 		   output [31:0] result);
 	
+	initial fork
+		equal = 0;
+		partialResultUnsigned = 0;
+		partialResultSigned = 0;
+	join
+
   wire signed [31:0] Xs, Ys;
   reg [31:0] partialResultUnsigned, partialResultSigned;
 	assign Xs = X;
