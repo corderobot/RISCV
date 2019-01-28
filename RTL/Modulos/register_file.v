@@ -19,6 +19,7 @@
 //
 //	Update History:
 //	- 01/01/2019: Creation of the module.
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //------------------------------------------------------------------------//
 
@@ -27,10 +28,45 @@ module register_file(writeData, writeEnable, readReg1, readReg2, writeReg, clk, 
 	input [31:0] writeData;
 	input [4:0] readReg1, readReg2, writeReg;
 
-	output [31:0] readData1, readData2;
-	reg [31:0] readData1, readData2;
+	output reg [31:0] readData1, readData2;
 
 	reg [31:0] register [0:30];
+
+	initial fork
+		readData1 = 0;
+		readData2 = 0;
+		register[0] = 0;
+		register[1] = 0;
+		register[2] = 0;
+		register[3] = 0;
+		register[4] = 0;
+		register[5] = 0;
+		register[6] = 0;
+		register[7] = 0;
+		register[8] = 0;
+		register[9] = 0;
+		register[10] = 0;
+		register[11] = 0;
+		register[12] = 0;
+		register[13] = 0;
+		register[14] = 0;
+		register[15] = 0;
+		register[16] = 0;
+		register[17] = 0;
+		register[18] = 0;
+		register[19] = 0;
+		register[20] = 0;
+		register[21] = 0;
+		register[22] = 0;
+		register[23] = 0;
+		register[24] = 0;
+		register[25] = 0;
+		register[26] = 0;
+		register[27] = 0;
+		register[28] = 0;
+		register[29] = 0;
+		register[30] = 0;
+	join
 
 	always @ (posedge clk)
 		fork
