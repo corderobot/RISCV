@@ -18,7 +18,7 @@
 //	- 05/01/2019: Added the submodule Hazards and modified the main module (controll).
 //	- 10/01/2019: Fixed the submodules: nopControll, brControll, writeRegEnable, writeMemEnable and muxABSelector. Once nop is activated, it takes 1 more clock cycle.
 //	- 11/01/2019: Fixed ALUSel, now it accepts sll and slli instructions.
-//	- 28/01/2019: Inicialización de los registros con valor 0.
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //	Submodule Description:
 //	- immGenSelector:     The purpose of this submodule is to send a signal that indicates to the
