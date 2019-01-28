@@ -13,6 +13,7 @@
 //	- 01/05/2019: Added pipeline, added the clk and nop inputs and a variable description section
 //	- 01/11/2019: Fixed nop's cycle. It takes now an extra cycle to accept a new value.
 //	- 01/14/2019: Added LUI output.
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //	Variable Description:
 //	- clk: Processor's secondary clock.
@@ -30,14 +31,20 @@
 	
 module immGenerator(clk, clock, nop, Inst, ILoad, S, SB, U, UJ, immGenerated, LUI);
 	input [24:0] Inst;
-	input ILoad, S, SB, U, UJ, clk, ,clock, nop;
+	input ILoad, S, SB, U, UJ, clk, nop;
   	output reg [31:0] immGenerated, LUI;
 
 	reg [24:0] pipeline;
 
 	reg flag;
 
-	initial flag = 0;
+	initial fork
+		flag = 0;
+		immGenerated = 0;
+		LUI = 0;
+		pipeline = 0;
+	join
+
 
   always @ (posedge clock)
 	begin
