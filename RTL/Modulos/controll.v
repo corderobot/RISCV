@@ -18,6 +18,7 @@
 //	- 05/01/2019: Added the submodule Hazards and modified the main module (controll).
 //	- 10/01/2019: Fixed the submodules: nopControll, brControll, writeRegEnable, writeMemEnable and muxABSelector. Once nop is activated, it takes 1 more clock cycle.
 //	- 11/01/2019: Fixed ALUSel, now it accepts sll and slli instructions.
+//	- 28/01/2019: Inicialización de los registros con valor 0.
 //
 //	Submodule Description:
 //	- immGenSelector:     The purpose of this submodule is to send a signal that indicates to the
@@ -41,16 +42,18 @@
 //
 //-------------------------------------------------------------------------//
 
-module controll(clk, instruction, blt, beq, writeRegEnableSignal, writeMemEnableSignal, loadEnableSignal, pcEnableSignal, unsignedOperationsSignal, nopSignal, brUnsignedSignal, brControllSignal, muxABSelectorSignal, writeBackSignal, loadControllSignal, aluSelectorSignal, immGenSelectorSignal);
+module controll(clk, instruction, blt, beq, writeRegEnableSignal, writeMemEnableSignal, loadEnableSignal, pcEnableSignal, unsignedOperationsSignal, nopSignal, brUnsignedSignal, muxABSelectorSignal, writeBackSignal, loadControllSignal, aluSelectorSignal, immGenSelectorSignal, alu1AHazSignal, alu1BHazSignal, alu2AHazSignal, alu2BHazSignal, mregAHazSignal, mregBHazSignal, rs1, rs2, rsd);
 	//-----Controll Section-----//
 	input clk, blt, beq;
 	input [4:0] rs1, rs2, rsd;
 	input [31:0] instruction;
 
-	output writeRegEnableSignal, writeMemEnableSignal, loadEnableSignal, pcEnableSignal, unsignedOperationsSignal, nopSignal, brUnsignedSignal, brControllSignal, alu1AHazSignal, alu1BHazSignal, alu2AHazSignal, alu2BHazSignal, mregAHazSignal, mregBHazSignal;
+	output writeRegEnableSignal, writeMemEnableSignal, loadEnableSignal, pcEnableSignal, unsignedOperationsSignal, nopSignal, brUnsignedSignal,  alu1AHazSignal, alu1BHazSignal, alu2AHazSignal, alu2BHazSignal, mregAHazSignal, mregBHazSignal;
 	output [1:0] muxABSelectorSignal, writeBackSignal, loadControllSignal;
 	output [3:0] aluSelectorSignal;
 	output [4:0] immGenSelectorSignal;
+
+	wire brControllSignal;
 
 	immGenSelector        igs(clk, nopSignal, instruction[6:0], immGenSelectorSignal);
 	muxABSelector         mabs(clk, nopSignal, instruction[6:0], muxABSelectorSignal);
@@ -59,7 +62,7 @@ module controll(clk, instruction, blt, beq, writeRegEnableSignal, writeMemEnable
 	loadEnable            le(clk, instruction[6:0], loadEnableSignal);
 	writeBack             wb(clk, instruction[6:0], writeBackSignal);
 	pcEnable              pce(clk, nopSignal, brControllSignal, instruction[6:0], pcEnableSignal);
-	unsignedOperations    uo(clk, nopSignal, instruction);
+	unsignedOperations    uo(clk, nopSignal, instruction, unsignedOperationsSignal);
 	loadControll          lc(clk, instruction, loadControllSignal);
 	ALUSel                as(clk, instruction, aluSelectorSignal);
 	brUnsigned            bru(clk, instruction, brUnsignedSignal);
@@ -72,12 +75,14 @@ module immGenSelector(clk, nop, opcode, pipeline);
 	//-----Immediate Generator Selector-----//
 	input clk, nop;
 	input [6:0] opcode;
-	output [4:0] pipeline;
-
-	reg [4:0] pipeline;
+	output reg [4:0] pipeline;
+	
 	reg flag;
 
-	initial flag = 1;
+	initial fork
+		flag = 1;
+		pipeline = 0;
+	join
 
 	always @ (posedge clk)
 	if(flag)
@@ -106,13 +111,15 @@ module muxABSelector(clk, nop, opcode, pipeline);
 	//-----Selector for multiplexor A and B-----//
 	input clk, nop;
 	input [6:0] opcode;
-	output [1:0] pipeline;
+	output reg [1:0] pipeline;
 
-	reg [1:0] pipeline;
 	reg flag;
   
-	initial flag = 0;
-  
+	initial fork
+		flag = 0;
+		pipeline = 0;
+  	join
+
 	always @ (posedge clk)
 	if(flag)
 		flag = 0;
@@ -134,11 +141,16 @@ module writeRegEnable(clk, nop, opcode, pipeline3);
 	//-----Write Register Enable signal-----//
 	input clk, nop;
 	input [6:0] opcode;
-	output pipeline3;
+	output reg pipeline3;
 
 	reg pipeline, pipeline2, pipeline3, flag;
 
-	initial flag = 0;
+	initial fork
+		flag = 0;
+		pipeline = 0;
+		pipeline2 = 0;
+		pipeline3 = 0;
+	join
 
 	always @ (posedge clk)
 	begin
@@ -162,9 +174,14 @@ module writeMemEnable(clk, opcode, pipeline2);
 	//-----Write Memory Enable signal-----//
 	input clk;
 	input [6:0] opcode;
-	output pipeline2;
+	output reg pipeline2;
 
-	reg pipeline, pipeline2;
+	reg pipeline;
+
+	initial fork
+		pipeline = 0;
+		pipeline2 = 0;
+	join
 
 	always @ (posedge clk)
 	begin
@@ -177,9 +194,14 @@ module loadEnable(clk, opcode, pipeline2);
 	//-----Load Enable signal-----//
 	input clk;
 	input [6:0] opcode;
-	output pipeline2;
+	output reg pipeline2;
 
-	reg pipeline, pipeline2;
+	reg pipeline;
+
+	initial fork
+		pipeline = 0;
+		pipeline2 = 0;
+	join
 
 	always @ (posedge clk)
 	begin
@@ -192,9 +214,14 @@ module writeBack(clk, opcode, pipeline2);
 	//-----Write Back signal-----//
 	input clk;
 	input [6:0] opcode;
-	output [1:0] pipeline2;
+	output reg [1:0] pipeline2;
 
-	reg [1:0] pipeline, pipeline2;
+	reg [1:0] pipeline;
+
+	initial fork
+		pipeline = 0;
+		pipeline2 = 0;
+	join
 
 	always @ (posedge clk)
 	begin
@@ -214,12 +241,16 @@ module pcEnable(clk, nop, bres, opcode, pipeline2);
 	//-----PC Enable signal-----//
 	input clk, nop, bres;
 	input [6:0] opcode;
-	output pipeline2;
+	output reg pipeline2;
 
 	reg [6:0] pipeline;
-	reg pipeline2, flag;
+	reg flag;
   
-	initial flag = 0;
+	initial fork
+		flag = 0;
+		pipeline = 0;
+		pipeline2 = 0;
+	join
 
 	always @ (posedge clk)
 	begin
@@ -245,8 +276,12 @@ module unsignedOperations(clk, nop, instruction, pipeline);
 
 	reg flag;
 
-	initial flag = 0;
-  
+	initial fork
+		flag = 0;
+		pipeline = 0;
+	join
+
+
 	always @ (posedge clk)
 		if(flag)  
 			flag = 0;
@@ -264,9 +299,14 @@ module loadControll(clk, inst, pipeline2);
 	//-----Load Controll signal-----//
 	input clk;
 	input [31:0] inst;
-	output [1:0] pipeline2;
+	output reg [1:0] pipeline2;
 
-	reg [1:0] pipeline, pipeline2;
+	reg [1:0] pipeline;
+
+	initial fork
+		pipeline = 0;
+		pipeline2 = 0;
+	join
 
 	always @(posedge clk)
 		begin
@@ -284,9 +324,9 @@ module ALUSel(clk, inst, pipeline);
 	//-----Alu Selector signal-----//
 	input clk;
 	input [31:0] inst;
-	output [3:0] pipeline;
+	output reg [3:0] pipeline;
 
-	reg [3:0] pipeline;
+	initial pipeline = 0;
 	
 	always @(posedge clk)
 			fork
@@ -327,11 +367,14 @@ module brControll(clk, nop, inst, blt, beq, pipeline);
 	//-----Branch Controll signal-----//
 	input [31:0] inst;
 	input clk, nop, blt, beq;
-	output pipeline;
+	output reg pipeline;
 	
-	reg pipeline, flag;
+	reg flag;
 
-	initial flag = 1;
+	initial fork
+		flag = 1;
+		pipeline = 0;
+	join
 
 	always @(posedge clk)
 	if(flag)
@@ -357,23 +400,28 @@ module brUnsigned(clk, inst, pipeline);
 	//-----Branch Unsigned signal-----//
 	input clk;
 	input [31:0] inst;
-	output pipeline;
+	output reg pipeline;
 
-	reg pipeline;
+	initial pipeline = 0;
 
 	always @ (posedge clk)
-	pipeline = inst[13];
+		pipeline = inst[13];
 endmodule
 
 module nopControll(clk, bres, inst, nop);
 	//-----Nop Controll signal-----//
 	input clk, bres;
 	input [31:0] inst;
-	output nop;
+	output reg nop;
 
-	reg pipelineA, pipelineB, nop, flag;
+	reg pipelineA, pipelineB, flag;
 
-	initial flag = 0;
+	initial fork
+		flag = 0;
+		pipelineA = 0;
+		pipelineB = 0;
+		nop = 0;
+	join
 
 	always @ (posedge clk)
 	begin
@@ -409,6 +457,18 @@ module Hazards(clk, rs1, rs2, rsd, ALU1AHaz, ALU1BHaz, ALU2AHaz, ALU2BHaz, MregA
 
   reg [4:0] pipeline, pipeline2, pipeline3;
 
+  initial fork
+  	pipeline = 0;
+  	pipeline2 = 0;
+  	pipeline3 = 0;
+  	ALU1AHaz = 0;
+  	ALU1BHaz = 0;
+  	MregAHaz = 0;
+  	MregBHaz = 0;
+  	ALU2AHaz = 0;
+  	ALU2BHaz = 0;
+  join
+  
   always @(posedge clk)
   begin
 	pipeline3 = pipeline2;
