@@ -10,6 +10,7 @@
 //
 //	Update History:
 //	- 01/14/2019: Creation of the module
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //-------------------------------------------------------------------------//
 
@@ -32,6 +33,11 @@ module hazardsMux(rr1, rr2, regHaz, dataHaz1, dataHaz2, LUI, imm, RAhz, RBhz, AL
 	input [31:0] rr1, rr2, regHaz, LUI, imm, dataHaz1, dataHaz2;
 	input RAhz, RBhz, ALU2Ahz, ALU2Bhz, ALU1Ahz, ALU1Bhz, luiHaz1, luiHaz2;
 	output reg [31:0] dataA, dataB;
+
+	initial fork
+		dataA = 0;
+		dataB = 0;
+	join
 
 	always @ (rr1, rr2, regHaz, dataHaz1, dataHaz2, LUI, imm, RAhz, RBhz, ALU2Ahz, ALU2Bhz, ALU1Ahz, ALU1Bhz, luiHaz1, luiHaz2)
 	fork
@@ -120,7 +126,11 @@ module hazardMuxPipeline(clk, nop, dataA, dataB, dA, dB);
 
 	reg flag;
 
-	initial flag = 0;
+	initial fork
+		flag = 0;
+		dA = 0;
+		dB = 0;
+	join
 
 	always @ (posedge clk)
 	if(flag)
@@ -144,6 +154,11 @@ module aluMux(rr1, rr2, PC, imm, mulA, mulB, dataA, dataB);
 	input [31:0] rr1, rr2, PC, imm;
 	input mulA, mulB;
 	output reg [31:0] dataA, dataB;
+
+	initial fork
+		dataA = 0;
+		dataB = 0;
+	join
 
 	always @ (rr1, rr2, PC, imm, mulA, mulB)
 	case({mulA, mulB})
