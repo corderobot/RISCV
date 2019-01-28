@@ -10,6 +10,7 @@
 //	Update History:
 //	- 01/05/2019: Creation of the module.
 //	- 01/14/2019: Fixed module's inputs. Added pc, alu, mem and imm as inputs of the modules.
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //	Variable Description:
 //	- clk: Processor's main clock.
@@ -23,9 +24,9 @@ module writeBackMux(clk, pc, alu, mem, imm, muxSelector, writeDataOrRegHazard);
 	input clk;
 	input [1:0] muxSelector;
 	input [31:0] pc, alu, mem, imm;
-	output [31:0] writeDataOrRegHazard;
+	output reg [31:0] writeDataOrRegHazard;
 
-	reg [31:0] writeDataOrRegHazard;
+	initial writeDataOrRegHazard = 0;
 
 	always @ (posedge clk)
 	case (muxSelector)
