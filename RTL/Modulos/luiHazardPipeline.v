@@ -10,6 +10,7 @@
 //
 //	Update History:
 //	- 01/14/2019: Creation of the module
+//	- 28/01/2019: Inicialización de los registros con valor 0.
 //
 //	Variable Description:
 //	- clk: Processor's secondary clock.
@@ -20,8 +21,10 @@
 
 module luiHazardPipeline(clk, luiHaz1, luiHaz2);
 	input clk;
-	input [31:0] luiHaz1;
-	output reg [31:0] luiHaz2;
+	input luiHaz1;
+	output reg luiHaz2;
+
+	initial luiHaz2 = 0;
 
 	always @ (posedge clk)
 	luiHaz2 <= luiHaz1;
