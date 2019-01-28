@@ -88,6 +88,8 @@ module mux32bits_2_to_1(data1, data2, selector, out);
 	input selector;
 	output reg [31:0] out;
 
+	initial out = 0;
+
 	always @ (data1, data2, selector)
 	case (selector)
 		1'b0: out = data1;
