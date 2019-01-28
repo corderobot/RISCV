@@ -10,7 +10,7 @@
 //
 //	Update History:
 //	- 01/14/2019: Creation of the module
-//	- 28/01/2019: Inicialización de los registros con valor 0.
+//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //	Variable Description:
 //	- clk: Processor's secondary clock.
