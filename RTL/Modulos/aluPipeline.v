@@ -15,10 +15,10 @@
 
 module aluPipeline(clk, aluRes, luiHaz2orALUPC);
 	input clk;
-  input [31:0] aluRes;
-  output reg [31:0] luiHaz2orALUPC;
+	input [31:0] aluRes;
+	output reg [31:0] luiHaz2orALUPC;
 
-  initial luiHaz2orALUPC = 0;
+	initial luiHaz2orALUPC = 0;
   
 	always @ (posedge clk)
 	luiHaz2orALUPC <= aluRes;
