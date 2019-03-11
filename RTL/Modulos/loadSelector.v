@@ -10,16 +10,15 @@
 //
 //	Update History:
 //	- 01/02/2019: Creation of the module.
-//  - 28/01/2019: Registers are now initialized with value 0.
 //
 //-------------------------------------------------------------------------//
 	
 module loadSelector(input [31:0] MemData,
                     input [1:0] LoadSelector,
                     output reg [31:0] Data);
-  	 
-    initial Data = 0;
-
+  	
+  initial Data = 0;
+  
   always @(MemData, LoadSelector)
     fork
       case(LoadSelector)
