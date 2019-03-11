@@ -10,7 +10,6 @@
 //	Update History:
 //	- 01/05/2019: Creation of the module.
 //	- 01/11/2019: Fixed module's name and the nop's cycle. It takes now an extra cycle to accept a new value.
-//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //	Variable Description:
 //	- clk: Processor's main clock.
@@ -27,7 +26,7 @@ module pcPipeline(clk, nop, pc, pipeline2, pipeline3);
 	input [31:0] pc;
 	output [31:0] pipeline2, pipeline3;
 
-	reg [31:0] pipeline;
+	reg [31:0] pipeline, pipeline2, pipeline3;
 
 	reg flag;
 
