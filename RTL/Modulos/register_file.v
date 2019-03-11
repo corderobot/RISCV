@@ -19,7 +19,6 @@
 //
 //	Update History:
 //	- 01/01/2019: Creation of the module.
-//	- 28/01/2019: Registers are now initialized with value 0.
 //
 //------------------------------------------------------------------------//
 
@@ -28,11 +27,12 @@ module register_file(writeData, writeEnable, readReg1, readReg2, writeReg, clk, 
 	input [31:0] writeData;
 	input [4:0] readReg1, readReg2, writeReg;
 
-	output reg [31:0] readData1, readData2;
+	output [31:0] readData1, readData2;
+	reg [31:0] readData1, readData2;
 
 	reg [31:0] register [0:30];
-
-	initial fork
+  
+  	initial fork
 		readData1 = 0;
 		readData2 = 0;
 		register[0] = 0;
